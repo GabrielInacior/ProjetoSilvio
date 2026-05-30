@@ -67,12 +67,23 @@ export default function AdminProdutos() {
       {showForm && (
         <Card><CardContent className="p-5">
           <form onSubmit={handleSubmit((d) => criar.mutate(d))} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[['nome', 'Nome'], ['categoria', 'Categoria'], ['imagemUrl', 'URL da imagem']].map(([f, l]) => (
+            {[['nome', 'Nome'], ['imagemUrl', 'URL da imagem']].map(([f, l]) => (
               <div key={f} className="space-y-1">
                 <Label>{l}</Label>
                 <Input {...register(f as keyof FormData)} />
               </div>
             ))}
+            <div className="space-y-1">
+              <Label>Categoria</Label>
+              <select {...register('categoria')} className="w-full border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring bg-background">
+                <option value="">Selecione...</option>
+                <option value="VESTUARIO">Vestuário</option>
+                <option value="ACESSORIOS">Acessórios</option>
+                <option value="MATERIAL">Material</option>
+                <option value="LIVROS">Livros</option>
+                <option value="OUTROS">Outros</option>
+              </select>
+            </div>
             <div className="space-y-1">
               <Label>Preço (R$)</Label>
               <Input type="number" step="0.01" {...register('preco')} />

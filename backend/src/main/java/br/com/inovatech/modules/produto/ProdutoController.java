@@ -34,7 +34,10 @@ public class ProdutoController {
             try { cat = CategoriaProduto.valueOf(categoria.toUpperCase()); } catch (IllegalArgumentException ignored) {}
         }
         String buscaTrim = (busca != null && !busca.isBlank()) ? busca.trim() : null;
-        return ResponseEntity.ok(produtoRepo.buscar(buscaTrim, cat, pageable).map(ProdutoDto::from));
+        Page<Produto> resultado = (cat != null)
+                ? produtoRepo.buscarComCategoria(buscaTrim, cat, pageable)
+                : produtoRepo.buscar(buscaTrim, pageable);
+        return ResponseEntity.ok(resultado.map(ProdutoDto::from));
     }
 
     @GetMapping("/{slug}")
@@ -47,6 +50,19 @@ public class ProdutoController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProdutoDto> criar(@RequestBody Produto produto) {
+        if (produto.getSlug() == null || produto.getSlug().isBlank()) {
+            String base = java.text.Normalizer.normalize(produto.getNome(), java.text.Normalizer.Form.NFD)
+                    .replaceAll("[^\\p{ASCII}]", "")
+                    .toLowerCase()
+                    .replaceAll("[^a-z0-9]+", "-")
+                    .replaceAll("^-|-$", "");
+            String slug = base;
+            int suffix = 1;
+            while (produtoRepo.findBySlugAndAtivoTrue(slug).isPresent()) {
+                slug = base + "-" + suffix++;
+            }
+            produto.setSlug(slug);
+        }
         return ResponseEntity.ok(ProdutoDto.from(produtoRepo.save(produto)));
     }
 
