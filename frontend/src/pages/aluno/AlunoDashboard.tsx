@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
-import { BookOpen, BarChart2, Calendar, FileText, ShoppingBag } from 'lucide-react'
+import { BookOpen, BarChart2, FileText, ShoppingBag } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 
 export default function AlunoDashboard() {
   const { usuario } = useAuthStore()
@@ -23,51 +25,51 @@ export default function AlunoDashboard() {
   ]
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Olá, {usuario?.nome?.split(' ')[0]}!</h1>
-        <p className="text-gray-500 mt-1">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">Olá, {usuario?.nome?.split(' ')[0]}!</h1>
+        <p className="text-muted-foreground mt-1">
           Bem-vindo ao portal acadêmico.
           {aluno && ` RA: ${aluno.ra} — ${aluno.curso}`}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map(({ label, value, Icon, to, color }) => (
-          <Link key={to} to={to}
-            className="bg-white rounded-xl border p-5 hover:shadow-md transition-shadow flex items-center gap-4">
-            <div className={`${color} text-white p-3 rounded-xl`}>
-              <Icon size={22} />
-            </div>
-            <div>
-              <div className="text-xl font-bold text-gray-900">{value}</div>
-              <div className="text-xs text-gray-500">{label}</div>
-            </div>
+          <Link key={to} to={to}>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className={`${color} text-white p-3 rounded-xl flex-shrink-0`}><Icon size={22} /></div>
+                <div>
+                  <div className="text-xl font-bold">{value}</div>
+                  <div className="text-xs text-muted-foreground">{label}</div>
+                </div>
+              </CardContent>
+            </Card>
           </Link>
         ))}
       </div>
 
-      {/* Active enrollments */}
       {matriculas.length > 0 && (
-        <div className="bg-white border rounded-xl p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">Turmas do semestre</h2>
-          <div className="space-y-3">
-            {matriculas.slice(0, 5).map((m: { id: number; disciplina: string; professor: string; sala: string; status: string; diaSemana: string; horaInicio: string }) => (
-              <div key={m.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                <div>
-                  <p className="font-medium text-gray-900 text-sm">{m.disciplina}</p>
-                  <p className="text-xs text-gray-500">{m.professor} • {m.sala} • {m.diaSemana} {m.horaInicio}</p>
+        <Card>
+          <CardContent className="p-6">
+            <h2 className="font-semibold mb-4">Turmas do semestre</h2>
+            <div className="space-y-3">
+              {matriculas.slice(0, 5).map((m: { id: number; disciplina: string; professor: string; sala: string; status: string; diaSemana: string; horaInicio: string }) => (
+                <div key={m.id} className="flex items-center justify-between py-2 border-b last:border-0">
+                  <div>
+                    <p className="font-medium text-sm">{m.disciplina}</p>
+                    <p className="text-xs text-muted-foreground">{m.professor} • {m.sala} • {m.diaSemana} {m.horaInicio}</p>
+                  </div>
+                  <Badge variant={m.status === 'ATIVA' ? 'success' : 'secondary'}>{m.status}</Badge>
                 </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                  m.status === 'ATIVA' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                }`}>{m.status}</span>
-              </div>
-            ))}
-          </div>
-          <Link to="/app/matriculas" className="text-blue-700 text-sm font-medium mt-3 inline-block hover:underline">
-            Ver todas →
-          </Link>
-        </div>
+              ))}
+            </div>
+            <Link to="/app/matriculas" className="text-blue-700 text-sm font-medium mt-3 inline-block hover:underline">
+              Ver todas →
+            </Link>
+          </CardContent>
+        </Card>
       )}
     </div>
   )

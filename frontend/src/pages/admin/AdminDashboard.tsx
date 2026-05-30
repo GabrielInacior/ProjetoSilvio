@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Users, GraduationCap, BookOpen, Package } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 export default function AdminDashboard() {
   const { data: alunos } = useQuery({ queryKey: ['admin-alunos-count'], queryFn: () => api.get('/alunos?size=1').then(r => r.data.totalElements) })
@@ -17,34 +19,40 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Dashboard Administrativo</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">Dashboard Administrativo</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map(({ label, value, Icon, to, color }) => (
-          <Link key={to} to={to} className="bg-white border rounded-xl p-5 hover:shadow-md transition-shadow flex items-center gap-4">
-            <div className={`${color} text-white p-3 rounded-xl`}><Icon size={22} /></div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900">{value}</div>
-              <div className="text-xs text-gray-500">{label}</div>
-            </div>
+          <Link key={to} to={to}>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className={`${color} text-white p-3 rounded-xl flex-shrink-0`}><Icon size={22} /></div>
+                <div>
+                  <div className="text-2xl font-bold">{value}</div>
+                  <div className="text-xs text-muted-foreground">{label}</div>
+                </div>
+              </CardContent>
+            </Card>
           </Link>
         ))}
       </div>
-      <div className="bg-white border rounded-xl p-6">
-        <h2 className="font-semibold text-gray-900 mb-3">Acesso rápido</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            ['/admin/alunos', 'Gerenciar Alunos'],
-            ['/admin/professores', 'Gerenciar Professores'],
-            ['/admin/turmas', 'Gerenciar Turmas'],
-            ['/admin/posts', 'Blog Posts'],
-          ].map(([to, label]) => (
-            <Link key={to} to={to} className="border rounded-lg px-3 py-2.5 text-sm text-center text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors">
-              {label}
-            </Link>
-          ))}
-        </div>
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="font-semibold mb-3">Acesso rápido</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              ['/admin/alunos', 'Gerenciar Alunos'],
+              ['/admin/professores', 'Gerenciar Professores'],
+              ['/admin/turmas', 'Gerenciar Turmas'],
+              ['/admin/posts', 'Blog Posts'],
+            ].map(([to, label]) => (
+              <Button key={to} variant="outline" size="sm" asChild>
+                <Link to={to}>{label}</Link>
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

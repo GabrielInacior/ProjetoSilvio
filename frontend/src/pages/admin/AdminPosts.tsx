@@ -6,6 +6,13 @@ import { Plus, Trash2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 const schema = z.object({
   titulo: z.string().min(2),
@@ -43,73 +50,75 @@ export default function AdminPosts() {
   })
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Blog Posts</h1>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-          <Plus size={16} /> Novo post
-        </button>
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">Blog Posts</h1>
+        <Button onClick={() => setShowForm(true)} className="bg-blue-700 hover:bg-blue-800"><Plus size={16} className="mr-1" /> Novo post</Button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit((d) => criar.mutate(d))} className="bg-white border rounded-xl p-5 mb-6 grid grid-cols-2 gap-4">
-          {[['titulo', 'Título'], ['slug', 'Slug'], ['autor', 'Autor'], ['imagemCapa', 'URL da imagem'], ['tags', 'Tags (separadas por vírgula)']].map(([f, l]) => (
-            <div key={f} className={f === 'tags' ? 'col-span-2' : ''}>
-              <label className="block text-xs font-medium text-gray-700 mb-1">{l}</label>
-              <input {...register(f as keyof FormData)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <Card><CardContent className="p-5">
+          <form onSubmit={handleSubmit((d) => criar.mutate(d))} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[['titulo', 'Título'], ['slug', 'Slug'], ['autor', 'Autor'], ['imagemCapa', 'URL da imagem']].map(([f, l]) => (
+              <div key={f} className="space-y-1">
+                <Label>{l}</Label>
+                <Input {...register(f as keyof FormData)} />
+              </div>
+            ))}
+            <div className="col-span-full space-y-1">
+              <Label>Tags (separadas por vírgula)</Label>
+              <Input {...register('tags')} />
             </div>
-          ))}
-          <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-700 mb-1">Resumo</label>
-            <textarea {...register('resumo')} rows={2} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-700 mb-1">Conteúdo (Markdown)</label>
-            <textarea {...register('conteudoMd')} rows={6} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div className="col-span-2 flex gap-2 justify-end">
-            <button type="button" onClick={() => setShowForm(false)} className="text-sm text-gray-500 px-4 py-2">Cancelar</button>
-            <button type="submit" disabled={criar.isPending} className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60">
-              {criar.isPending ? 'Criando...' : 'Publicar'}
-            </button>
-          </div>
-        </form>
+            <div className="col-span-full space-y-1">
+              <Label>Resumo</Label>
+              <textarea {...register('resumo')} rows={2} className="w-full border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="col-span-full space-y-1">
+              <Label>Conteúdo (Markdown)</Label>
+              <textarea {...register('conteudoMd')} rows={6} className="w-full border border-input rounded-md px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring" />
+            </div>
+            <div className="col-span-full flex gap-2 justify-end">
+              <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
+              <Button type="submit" disabled={criar.isPending} className="bg-blue-700 hover:bg-blue-800">{criar.isPending ? 'Criando...' : 'Publicar'}</Button>
+            </div>
+          </form>
+        </CardContent></Card>
       )}
 
-      {isLoading ? (
-        <div className="space-y-2">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />)}</div>
-      ) : (
-        <>
-          <div className="bg-white border rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>{['Título', 'Autor', 'Publicado em', 'Tags', ''].map(h => <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700">{h}</th>)}</tr>
-              </thead>
-              <tbody className="divide-y">
-                {(data?.content ?? []).map((p: { id: number; titulo: string; autor?: string; publicadoEm: string; tags?: string[] }) => (
-                  <tr key={p.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{p.titulo}</td>
-                    <td className="px-4 py-3 text-gray-600">{p.autor ?? '—'}</td>
-                    <td className="px-4 py-3 text-gray-600 text-xs">{new Date(p.publicadoEm).toLocaleDateString('pt-BR')}</td>
-                    <td className="px-4 py-3">{p.tags?.slice(0,2).map(t => <span key={t} className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded mr-1">{t}</span>)}</td>
-                    <td className="px-4 py-3">
-                      <button onClick={() => { if (confirm('Remover post?')) deletar.mutate(p.id) }} className="text-red-500 hover:text-red-700 p-1"><Trash2 size={16} /></button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <Card><CardContent className="p-0">
+        {isLoading ? (
+          <div className="p-4 space-y-2">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={`skel-${i}`} className="h-10 w-full" />)}</div>
+        ) : (
+          <Table>
+            <TableHeader><TableRow>{['Título', 'Autor', 'Publicado em', 'Tags', ''].map(h => <TableHead key={h}>{h}</TableHead>)}</TableRow></TableHeader>
+            <TableBody>
+              {(data?.content ?? []).map((p: { id: number; titulo: string; autor?: string; publicadoEm: string; tags?: string[] }) => (
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium">{p.titulo}</TableCell>
+                  <TableCell className="text-muted-foreground hidden md:table-cell">{p.autor ?? '—'}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs">{new Date(p.publicadoEm).toLocaleDateString('pt-BR')}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{p.tags?.slice(0,2).map(t => <Badge key={t} variant="secondary" className="mr-1 text-xs">{t}</Badge>)}</TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"
+                      onClick={() => { if (confirm('Remover post?')) deletar.mutate(p.id) }}>
+                      <Trash2 size={16} />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </CardContent></Card>
+
+      {data && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+          <span>{data.totalElements} posts</span>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>Anterior</Button>
+            <Button variant="outline" size="sm" disabled={data.last} onClick={() => setPage(p => p + 1)}>Próxima</Button>
           </div>
-          {data && (
-            <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
-              <span>{data.totalElements} posts</span>
-              <div className="flex gap-2">
-                <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-gray-50">Anterior</button>
-                <button disabled={data.last} onClick={() => setPage(p => p + 1)} className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-gray-50">Próxima</button>
-              </div>
-            </div>
-          )}
-        </>
+        </div>
       )}
     </div>
   )

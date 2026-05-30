@@ -6,6 +6,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import ptBrLocale from '@fullcalendar/core/locales/pt-br'
 import { useMemo } from 'react'
+import { Card, CardContent } from '@/components/ui/card'
 
 export default function AlunoCalendario() {
   const { data: matriculas = [] } = useQuery({
@@ -28,9 +29,9 @@ export default function AlunoCalendario() {
     })), [matriculas])
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Calendário</h1>
-      <div className="bg-white border rounded-xl p-4">
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Calendário</h1>
+      <Card><CardContent className="p-4">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="timeGridWeek"
@@ -46,7 +47,7 @@ export default function AlunoCalendario() {
           slotMinTime="07:00:00"
           slotMaxTime="22:00:00"
         />
-      </div>
+      </CardContent></Card>
     </div>
   )
 }

@@ -2,6 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { useState } from 'react'
 import { Search } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default function AdminAlunos() {
   const [page, setPage] = useState(0)
@@ -12,55 +18,58 @@ export default function AdminAlunos() {
   })
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Alunos</h1>
-        <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">Alunos</h1>
+        <div className="relative w-full sm:w-64">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
             type="text" placeholder="Buscar aluno..." value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0) }}
-            className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="pl-9"
           />
         </div>
       </div>
 
-      {isLoading ? (
-        <div className="space-y-2">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />)}</div>
-      ) : (
-        <>
-          <div className="bg-white border rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>{['RA', 'Nome', 'E-mail', 'Curso', 'Status'].map(h => <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700">{h}</th>)}</tr>
-              </thead>
-              <tbody className="divide-y">
-                {(data?.content ?? []).map((a: { id: number; ra: string; nome: string; email: string; curso: string; status: string }) => (
-                  <tr key={a.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-mono text-gray-700 text-xs">{a.ra}</td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{a.nome}</td>
-                    <td className="px-4 py-3 text-gray-600">{a.email}</td>
-                    <td className="px-4 py-3 text-gray-600">{a.curso}</td>
-                    <td className="px-4 py-3">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${a.status === 'ATIVO' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{a.status}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {data && (
-            <div className="flex items-center justify-between mt-4 text-sm text-gray-600">
-              <span>{data.totalElements} alunos no total</span>
-              <div className="flex gap-2">
-                <button disabled={page === 0} onClick={() => setPage(p => p - 1)}
-                  className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-gray-50">Anterior</button>
-                <button disabled={data.last} onClick={() => setPage(p => p + 1)}
-                  className="px-3 py-1.5 border rounded-md disabled:opacity-40 hover:bg-gray-50">Próxima</button>
-              </div>
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="p-4 space-y-2">
+              {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
             </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {['RA', 'Nome', 'E-mail', 'Curso', 'Status'].map(h => <TableHead key={h}>{h}</TableHead>)}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(data?.content ?? []).map((a: { id: number; ra: string; nome: string; email: string; curso: string; status: string }) => (
+                  <TableRow key={a.id}>
+                    <TableCell className="font-mono text-xs">{a.ra}</TableCell>
+                    <TableCell className="font-medium">{a.nome}</TableCell>
+                    <TableCell className="text-muted-foreground hidden md:table-cell">{a.email}</TableCell>
+                    <TableCell className="text-muted-foreground hidden lg:table-cell">{a.curso}</TableCell>
+                    <TableCell>
+                      <Badge variant={a.status === 'ATIVO' ? 'success' : 'secondary'}>{a.status}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
-        </>
+        </CardContent>
+      </Card>
+
+      {data && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+          <span>{data.totalElements} alunos no total</span>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>Anterior</Button>
+            <Button variant="outline" size="sm" disabled={data.last} onClick={() => setPage(p => p + 1)}>Próxima</Button>
+          </div>
+        </div>
       )}
     </div>
   )

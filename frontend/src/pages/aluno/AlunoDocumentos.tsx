@@ -2,6 +2,8 @@ import { api } from '@/lib/api'
 import { FileText, Download } from 'lucide-react'
 import { toast } from 'sonner'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 
 const docs = [
   {
@@ -42,28 +44,28 @@ export default function AlunoDocumentos() {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Documentos</h1>
-      <p className="text-gray-500 mb-8">Gere e baixe seus documentos acadêmicos em PDF.</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="space-y-4">
+      <div>
+        <h1 className="text-2xl font-bold">Documentos</h1>
+        <p className="text-muted-foreground mt-1">Gere e baixe seus documentos acadêmicos em PDF.</p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {docs.map((doc) => (
-          <div key={doc.id} className="bg-white border rounded-xl p-6 flex items-start gap-4">
-            <div className="bg-blue-100 text-blue-700 p-3 rounded-xl">
-              <FileText size={24} />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-gray-900">{doc.titulo}</h3>
-              <p className="text-gray-500 text-sm mt-1">{doc.descricao}</p>
-              <button
-                onClick={() => download(doc)}
-                disabled={loading === doc.id}
-                className="mt-4 flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 disabled:opacity-60 transition-colors"
-              >
-                <Download size={15} />
-                {loading === doc.id ? 'Gerando...' : 'Baixar PDF'}
-              </button>
-            </div>
-          </div>
+          <Card key={doc.id}>
+            <CardContent className="p-6 flex items-start gap-4">
+              <div className="bg-blue-100 text-blue-700 p-3 rounded-xl flex-shrink-0">
+                <FileText size={24} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold">{doc.titulo}</h3>
+                <p className="text-muted-foreground text-sm mt-1">{doc.descricao}</p>
+                <Button className="mt-4" size="sm" onClick={() => download(doc)} disabled={loading === doc.id}>
+                  <Download size={15} className="mr-2" />
+                  {loading === doc.id ? 'Gerando...' : 'Baixar PDF'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

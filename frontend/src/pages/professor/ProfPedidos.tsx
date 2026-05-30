@@ -3,6 +3,10 @@ import { api } from '@/lib/api'
 import { Package, MapPin, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type ItemPedido = {
   nome: string
@@ -22,27 +26,27 @@ type Pedido = {
   itens: ItemPedido[]
 }
 
-const statusColor: Record<string, string> = {
-  CONFIRMADO: 'bg-green-100 text-green-700',
-  PENDENTE:   'bg-yellow-100 text-yellow-700',
-  CANCELADO:  'bg-red-100 text-red-500',
-  ENTREGUE:   'bg-blue-100 text-blue-700',
+const statusVariant: Record<string, 'success' | 'warning' | 'destructive' | 'default'> = {
+  CONFIRMADO: 'success',
+  PENDENTE: 'warning',
+  CANCELADO: 'destructive',
+  ENTREGUE: 'default',
 }
 
 function PedidoCard({ p }: { readonly p: Pedido }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="bg-white border rounded-xl overflow-hidden">
+    <Card className="overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors text-left"
+        className="w-full flex items-center justify-between p-5 hover:bg-muted/50 transition-colors text-left"
       >
         <div className="flex items-center gap-4">
           <Package size={20} className="text-emerald-600 shrink-0" />
           <div>
-            <p className="font-semibold text-gray-900">Pedido #{p.id}</p>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="font-semibold">Pedido #{p.id}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
               {new Date(p.criadoEm).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
               {' · '}{p.quantidadeItens} {p.quantidadeItens === 1 ? 'item' : 'itens'}
             </p>
@@ -50,47 +54,45 @@ function PedidoCard({ p }: { readonly p: Pedido }) {
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <p className="font-bold text-gray-900">R$ {p.valorTotal?.toFixed(2)}</p>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[p.status] ?? 'bg-gray-100 text-gray-600'}`}>
-              {p.status}
-            </span>
+            <p className="font-bold">R$ {p.valorTotal?.toFixed(2)}</p>
+            <Badge variant={statusVariant[p.status] ?? 'secondary'}>{p.status}</Badge>
           </div>
-          {open ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
+          {open ? <ChevronUp size={16} className="text-muted-foreground" /> : <ChevronDown size={16} className="text-muted-foreground" />}
         </div>
       </button>
 
       {open && (
         <div className="border-t px-5 pb-5 pt-4 space-y-4">
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Itens</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Itens</p>
             <div className="space-y-2">
               {p.itens.map((item, i) => (
                 <div key={`${item.nome}-${String(i)}`} className="flex items-center justify-between text-sm">
-                  <span className="text-gray-700">{item.nome} <span className="text-gray-400">× {item.quantidade}</span></span>
-                  <span className="font-medium text-gray-900">R$ {item.subtotal.toFixed(2)}</span>
+                  <span>{item.nome} <span className="text-muted-foreground">× {item.quantidade}</span></span>
+                  <span className="font-medium">R$ {item.subtotal.toFixed(2)}</span>
                 </div>
               ))}
             </div>
-            <div className="flex items-center justify-between text-sm font-bold border-t pt-2 mt-2 text-gray-900">
+            <div className="flex items-center justify-between text-sm font-bold border-t pt-2 mt-2">
               <span>Total</span>
               <span className="text-emerald-700">R$ {p.valorTotal?.toFixed(2)}</span>
             </div>
           </div>
           {p.enderecoEntrega && (
-            <div className="flex gap-2 text-sm text-gray-600">
-              <MapPin size={15} className="shrink-0 mt-0.5 text-gray-400" />
+            <div className="flex gap-2 text-sm text-muted-foreground">
+              <MapPin size={15} className="shrink-0 mt-0.5" />
               <span>{p.enderecoEntrega}</span>
             </div>
           )}
           {p.observacoes && (
-            <div className="flex gap-2 text-sm text-gray-600">
-              <MessageSquare size={15} className="shrink-0 mt-0.5 text-gray-400" />
+            <div className="flex gap-2 text-sm text-muted-foreground">
+              <MessageSquare size={15} className="shrink-0 mt-0.5" />
               <span>{p.observacoes}</span>
             </div>
           )}
         </div>
       )}
-    </div>
+    </Card>
   )
 }
 
@@ -106,13 +108,13 @@ export default function ProfPedidos() {
     if (isLoading) {
       return (
         <div className="space-y-3">
-          {Array.from({ length: 4 }).map((_, i) => <div key={`skel-${String(i)}`} className="h-20 bg-gray-100 rounded-lg animate-pulse" />)}
+          {Array.from({ length: 4 }).map((_, i) => <Skeleton key={`skel-${String(i)}`} className="h-20 w-full" />)}
         </div>
       )
     }
     if (pedidos.length === 0) {
       return (
-        <div className="text-center py-20 text-gray-400">
+        <div className="text-center py-20 text-muted-foreground">
           <Package size={40} className="mx-auto mb-3 opacity-50" />
           <p>Nenhum pedido encontrado.</p>
           <Link to="/loja" className="text-sm text-emerald-700 hover:underline mt-2 inline-block">
@@ -129,13 +131,10 @@ export default function ProfPedidos() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Meus Pedidos</h1>
-        <Link to="/loja"
-          className="text-sm bg-emerald-700 text-white px-4 py-2 rounded-lg hover:bg-emerald-800 transition-colors">
-          Ir à loja
-        </Link>
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">Meus Pedidos</h1>
+        <Button variant="outline" asChild><Link to="/loja">Ir à loja</Link></Button>
       </div>
       {renderContent()}
     </div>

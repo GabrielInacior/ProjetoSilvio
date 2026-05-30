@@ -3,6 +3,11 @@ import { api } from '@/lib/api'
 import { toast } from 'sonner'
 import { PlusCircle, X, BookOpen } from 'lucide-react'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 type Matricula = {
   id: number
@@ -32,10 +37,10 @@ type Turma = {
 
 const semLabel = (s: string) => s === 'PRIMEIRO' ? '1º' : '2º'
 
-function statusClass(s: string) {
-  if (s === 'ATIVA') return 'bg-green-100 text-green-700'
-  if (s === 'TRANCADA') return 'bg-yellow-100 text-yellow-700'
-  return 'bg-gray-100 text-gray-600'
+function statusVariant(s: string): 'success' | 'warning' | 'secondary' {
+  if (s === 'ATIVA') return 'success'
+  if (s === 'TRANCADA') return 'warning'
+  return 'secondary'
 }
 
 function plural(n: number, singular: string, plural: string) {
@@ -83,15 +88,13 @@ export default function AlunoMatriculas() {
     if (isLoading) {
       return (
         <div className="space-y-3">
-          {Array.from({ length: 4 }, (_, i) => `skel-${i}`).map(k => (
-            <div key={k} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
-          ))}
+          {Array.from({ length: 4 }, (_, i) => `skel-${i}`).map(k => <Skeleton key={k} className="h-12 w-full" />)}
         </div>
       )
     }
     if (matriculas.length === 0) {
       return (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-muted-foreground">
           <BookOpen size={36} className="mx-auto mb-3 opacity-40" />
           <p>Você não possui matrículas ativas.</p>
           <button onClick={() => setShowDisponiveis(true)} className="text-sm text-blue-600 hover:underline mt-2">
@@ -101,42 +104,42 @@ export default function AlunoMatriculas() {
       )
     }
     return (
-      <div className="bg-white border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              {['Disciplina', 'Professor', 'Sala', 'Dia/Hora', 'Semestre', 'Status', ''].map(h => (
-                <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y">
+      <Card><CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Disciplina</TableHead>
+              <TableHead className="hidden md:table-cell">Professor</TableHead>
+              <TableHead className="hidden lg:table-cell">Sala</TableHead>
+              <TableHead className="hidden xl:table-cell">Dia/Hora</TableHead>
+              <TableHead className="hidden md:table-cell">Semestre</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {matriculas.map(m => (
-              <tr key={m.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">{m.disciplina}</td>
-                <td className="px-4 py-3 text-gray-600">{m.professor ?? '—'}</td>
-                <td className="px-4 py-3 text-gray-600">{m.sala}</td>
-                <td className="px-4 py-3 text-gray-600">{m.diaSemana} {m.horaInicio}–{m.horaFim}</td>
-                <td className="px-4 py-3 text-gray-600">{m.ano}/{semLabel(m.semestre)}</td>
-                <td className="px-4 py-3">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClass(m.status)}`}>{m.status}</span>
-                </td>
-                <td className="px-4 py-3">
+              <TableRow key={m.id}>
+                <TableCell className="font-medium">{m.disciplina}</TableCell>
+                <TableCell className="hidden md:table-cell text-muted-foreground">{m.professor ?? '—'}</TableCell>
+                <TableCell className="hidden lg:table-cell text-muted-foreground">{m.sala}</TableCell>
+                <TableCell className="hidden xl:table-cell text-muted-foreground">{m.diaSemana} {m.horaInicio}–{m.horaFim}</TableCell>
+                <TableCell className="hidden md:table-cell text-muted-foreground">{m.ano}/{semLabel(m.semestre)}</TableCell>
+                <TableCell><Badge variant={statusVariant(m.status)}>{m.status}</Badge></TableCell>
+                <TableCell>
                   {m.status === 'ATIVA' && (
-                    <button
-                      onClick={() => { if (confirm(`Cancelar matrícula em ${m.disciplina}?`)) mutCancelar.mutate(m.id) }}
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive h-8 w-8"
                       title="Cancelar matrícula"
-                      className="text-gray-400 hover:text-red-600 transition-colors"
-                    >
+                      onClick={() => { if (confirm(`Cancelar matrícula em ${m.disciplina}?`)) mutCancelar.mutate(m.id) }}>
                       <X size={15} />
-                    </button>
+                    </Button>
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </CardContent></Card>
     )
   }
 
@@ -144,81 +147,74 @@ export default function AlunoMatriculas() {
     if (loadingDisp) {
       return (
         <div className="space-y-2">
-          {Array.from({ length: 4 }, (_, i) => `disp-${i}`).map(k => (
-            <div key={k} className="h-14 bg-gray-100 rounded-lg animate-pulse" />
-          ))}
+          {Array.from({ length: 4 }, (_, i) => `disp-${i}`).map(k => <Skeleton key={k} className="h-12 w-full" />)}
         </div>
       )
     }
     if (disponiveis.length === 0) {
       return (
-        <div className="text-center py-12 text-gray-400 bg-white border rounded-xl">
+        <div className="text-center py-12 text-muted-foreground border rounded-xl">
           <p>Não há turmas disponíveis para matrícula no momento.</p>
         </div>
       )
     }
     return (
-      <div className="bg-white border rounded-xl overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              {['Disciplina', 'Professor', 'Sala', 'Dia/Hora', 'Semestre', 'Vagas', ''].map(h => (
-                <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y">
+      <Card><CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Disciplina</TableHead>
+              <TableHead className="hidden md:table-cell">Professor</TableHead>
+              <TableHead className="hidden lg:table-cell">Sala</TableHead>
+              <TableHead className="hidden xl:table-cell">Dia/Hora</TableHead>
+              <TableHead className="hidden md:table-cell">Semestre</TableHead>
+              <TableHead className="hidden lg:table-cell">Vagas</TableHead>
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {disponiveis.map(t => (
-              <tr key={t.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">{t.disciplina}</td>
-                <td className="px-4 py-3 text-gray-600">{t.professor ?? <span className="text-gray-400 italic">A definir</span>}</td>
-                <td className="px-4 py-3 text-gray-600">{t.sala}</td>
-                <td className="px-4 py-3 text-gray-600">{t.diaSemana} {t.horaInicio}–{t.horaFim}</td>
-                <td className="px-4 py-3 text-gray-600">{t.ano}/{semLabel(t.semestre)}</td>
-                <td className="px-4 py-3 text-gray-600">{t.vagas}</td>
-                <td className="px-4 py-3">
-                  <button
-                    onClick={() => mutMatricular.mutate(t.id)}
-                    disabled={mutMatricular.isPending}
-                    className="flex items-center gap-1.5 bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-800 disabled:opacity-60 transition-colors"
-                  >
-                    <PlusCircle size={13} /> Matricular
-                  </button>
-                </td>
-              </tr>
+              <TableRow key={t.id}>
+                <TableCell className="font-medium">{t.disciplina}</TableCell>
+                <TableCell className="hidden md:table-cell text-muted-foreground">{t.professor ?? <span className="italic text-muted-foreground">A definir</span>}</TableCell>
+                <TableCell className="hidden lg:table-cell text-muted-foreground">{t.sala}</TableCell>
+                <TableCell className="hidden xl:table-cell text-muted-foreground">{t.diaSemana} {t.horaInicio}–{t.horaFim}</TableCell>
+                <TableCell className="hidden md:table-cell text-muted-foreground">{t.ano}/{semLabel(t.semestre)}</TableCell>
+                <TableCell className="hidden lg:table-cell text-muted-foreground">{t.vagas}</TableCell>
+                <TableCell>
+                  <Button size="sm" onClick={() => mutMatricular.mutate(t.id)} disabled={mutMatricular.isPending}>
+                    <PlusCircle size={13} className="mr-1" /> Matricular
+                  </Button>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </CardContent></Card>
     )
   }
 
   return (
     <div className="space-y-8">
-      {/* Minhas matrículas */}
       <div>
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Minhas Matrículas</h1>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <h1 className="text-2xl font-bold">Minhas Matrículas</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
               {matriculas.length} {plural(matriculas.length, 'turma ativa', 'turmas ativas')}
             </p>
           </div>
-          <button
-            onClick={() => setShowDisponiveis(v => !v)}
-            className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors"
-          >
-            <PlusCircle size={16} />
+          <Button onClick={() => setShowDisponiveis(v => !v)}>
+            <PlusCircle size={16} className="mr-2" />
             {showDisponiveis ? 'Fechar' : 'Matricular-se'}
-          </button>
+          </Button>
         </div>
         {renderMatriculas()}
       </div>
 
-      {/* Turmas disponíveis */}
       {showDisponiveis && (
         <div>
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Turmas Disponíveis</h2>
+          <h2 className="text-lg font-bold mb-4">Turmas Disponíveis</h2>
           {renderDisponiveis()}
         </div>
       )}

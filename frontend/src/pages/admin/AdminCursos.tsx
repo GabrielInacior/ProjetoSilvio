@@ -6,6 +6,12 @@ import { Plus, Trash2 } from 'lucide-react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 type FormData = {
   nome: string
@@ -38,7 +44,7 @@ export default function AdminCursos() {
     queryFn: () => api.get('/cursos').then(r => r.data),
   })
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema as any) as Resolver<FormData> })
+  const { register, handleSubmit, reset } = useForm<FormData>({ resolver: zodResolver(schema as any) as Resolver<FormData> })
 
   const criar = useMutation({
     mutationFn: (d: FormData) => api.post('/cursos', d),
@@ -53,67 +59,71 @@ export default function AdminCursos() {
   })
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Cursos</h1>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-          <Plus size={16} /> Novo curso
-        </button>
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">Cursos</h1>
+        <Button onClick={() => setShowForm(true)} className="bg-blue-700 hover:bg-blue-800"><Plus size={16} className="mr-1" /> Novo curso</Button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit((d) => criar.mutate(d))} className="bg-white border rounded-xl p-5 mb-6 grid grid-cols-2 gap-4">
-          {[['nome', 'Nome'], ['slug', 'Slug'], ['area', 'Área'], ['modalidade', 'Modalidade'], ['duracao', 'Duração'], ['imagemUrl', 'URL da imagem']].map(([field, label]) => (
-            <div key={field}>
-              <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
-              <input {...register(field as keyof FormData)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-          ))}
-          {[['cargaHoraria', 'Carga horária (h)'], ['vagas', 'Vagas']].map(([field, label]) => (
-            <div key={field}>
-              <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
-              <input type="number" {...register(field as keyof FormData)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-          ))}
-          <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-700 mb-1">Descrição</label>
-            <textarea {...register('descricao')} rows={2} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div className="col-span-2 flex gap-2 justify-end">
-            <button type="button" onClick={() => setShowForm(false)} className="text-sm text-gray-500 px-4 py-2">Cancelar</button>
-            <button type="submit" disabled={criar.isPending} className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60">
-              {criar.isPending ? 'Criando...' : 'Criar'}
-            </button>
-          </div>
-        </form>
+        <Card>
+          <CardContent className="p-5">
+            <form onSubmit={handleSubmit((d) => criar.mutate(d))} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[['nome', 'Nome'], ['slug', 'Slug'], ['area', 'Área'], ['modalidade', 'Modalidade'], ['duracao', 'Duração'], ['imagemUrl', 'URL da imagem']].map(([field, label]) => (
+                <div key={field} className="space-y-1">
+                  <Label>{label}</Label>
+                  <Input {...register(field as keyof FormData)} />
+                </div>
+              ))}
+              {[['cargaHoraria', 'Carga horária (h)'], ['vagas', 'Vagas']].map(([field, label]) => (
+                <div key={field} className="space-y-1">
+                  <Label>{label}</Label>
+                  <Input type="number" {...register(field as keyof FormData)} />
+                </div>
+              ))}
+              <div className="col-span-full space-y-1">
+                <Label>Descrição</Label>
+                <textarea {...register('descricao')} rows={2} className="w-full border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+              </div>
+              <div className="col-span-full flex gap-2 justify-end">
+                <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
+                <Button type="submit" disabled={criar.isPending} className="bg-blue-700 hover:bg-blue-800">{criar.isPending ? 'Criando...' : 'Criar'}</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       )}
 
-      {isLoading ? (
-        <div className="space-y-2">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-14 bg-gray-100 rounded-lg animate-pulse" />)}</div>
-      ) : (
-        <div className="bg-white border rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>{['Nome', 'Slug', 'Área', 'Carga horária', 'Vagas', ''].map(h => <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700">{h}</th>)}</tr>
-            </thead>
-            <tbody className="divide-y">
-              {cursos.map((c: { id: number; nome: string; slug: string; area?: string; cargaHoraria?: number; vagas?: number }) => (
-                <tr key={c.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-900">{c.nome}</td>
-                  <td className="px-4 py-3 text-gray-500 font-mono text-xs">{c.slug}</td>
-                  <td className="px-4 py-3 text-gray-600">{c.area ?? '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{c.cargaHoraria ? `${c.cargaHoraria}h` : '—'}</td>
-                  <td className="px-4 py-3 text-gray-600">{c.vagas ?? '—'}</td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => { if (confirm('Remover curso?')) deletar.mutate(c.id) }}
-                      className="text-red-500 hover:text-red-700 p-1"><Trash2 size={16} /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="p-4 space-y-2">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={`skel-${i}`} className="h-10 w-full" />)}</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>{['Nome', 'Slug', 'Área', 'Carga horária', 'Vagas', ''].map(h => <TableHead key={h}>{h}</TableHead>)}</TableRow>
+              </TableHeader>
+              <TableBody>
+                {cursos.map((c: { id: number; nome: string; slug: string; area?: string; cargaHoraria?: number; vagas?: number }) => (
+                  <TableRow key={c.id}>
+                    <TableCell className="font-medium">{c.nome}</TableCell>
+                    <TableCell className="font-mono text-xs text-muted-foreground">{c.slug}</TableCell>
+                    <TableCell className="text-muted-foreground hidden md:table-cell">{c.area ?? '—'}</TableCell>
+                    <TableCell className="text-muted-foreground hidden lg:table-cell">{c.cargaHoraria ? `${c.cargaHoraria}h` : '—'}</TableCell>
+                    <TableCell className="text-muted-foreground hidden xl:table-cell">{c.vagas ?? '—'}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"
+                        onClick={() => { if (confirm('Remover curso?')) deletar.mutate(c.id) }}>
+                        <Trash2 size={16} />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

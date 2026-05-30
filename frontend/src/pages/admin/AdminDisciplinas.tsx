@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+﻿import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -6,6 +6,12 @@ import { Plus, Trash2 } from 'lucide-react'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 type FormData = {
   nome: string
@@ -46,67 +52,72 @@ export default function AdminDisciplinas() {
   })
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Disciplinas</h1>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-1 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800">
-          <Plus size={16} /> Nova disciplina
-        </button>
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">Disciplinas</h1>
+        <Button onClick={() => setShowForm(true)} className="bg-blue-700 hover:bg-blue-800"><Plus size={16} className="mr-1" /> Nova disciplina</Button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit((d) => criar.mutate(d))} className="bg-white border rounded-xl p-5 mb-6 grid grid-cols-2 gap-4">
-          {[['nome', 'Nome'], ['codigo', 'Código']].map(([f, l]) => (
-            <div key={f}>
-              <label className="block text-xs font-medium text-gray-700 mb-1">{l}</label>
-              <input {...register(f as keyof FormData)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
-          ))}
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Carga horária (h)</label>
-            <input type="number" {...register('cargaHoraria')} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Semestre sugerido</label>
-            <input type="number" {...register('semestreSugerido')} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-700 mb-1">Ementa</label>
-            <textarea {...register('ementa')} rows={2} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div className="col-span-2 flex gap-2 justify-end">
-            <button type="button" onClick={() => setShowForm(false)} className="text-sm text-gray-500 px-4 py-2">Cancelar</button>
-            <button type="submit" disabled={criar.isPending} className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-60">
-              {criar.isPending ? 'Criando...' : 'Criar'}
-            </button>
-          </div>
-        </form>
+        <Card>
+          <CardContent className="p-5">
+            <form onSubmit={handleSubmit((d) => criar.mutate(d))} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[['nome', 'Nome'], ['codigo', 'Codigo']].map(([f, l]) => (
+                <div key={f} className="space-y-1">
+                  <Label>{l}</Label>
+                  <Input {...register(f as keyof FormData)} />
+                </div>
+              ))}
+              <div className="space-y-1">
+                <Label>Carga horaria (h)</Label>
+                <Input type="number" {...register('cargaHoraria')} />
+              </div>
+              <div className="space-y-1">
+                <Label>Semestre sugerido</Label>
+                <Input type="number" {...register('semestreSugerido')} />
+              </div>
+              <div className="col-span-full space-y-1">
+                <Label>Ementa</Label>
+                <textarea {...register('ementa')} rows={2} className="w-full border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+              </div>
+              <div className="col-span-full flex gap-2 justify-end">
+                <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
+                <Button type="submit" disabled={criar.isPending} className="bg-blue-700 hover:bg-blue-800">{criar.isPending ? 'Criando...' : 'Criar'}</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       )}
 
-      {isLoading ? (
-        <div className="space-y-2">{Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-12 bg-gray-100 rounded-lg animate-pulse" />)}</div>
-      ) : (
-        <div className="bg-white border rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>{['Código', 'Nome', 'Carga horária', 'Semestre sugerido', ''].map(h => <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700">{h}</th>)}</tr>
-            </thead>
-            <tbody className="divide-y">
-              {disciplinas.map((d: { id: number; codigo: string; nome: string; cargaHoraria: number; semestreSugerido?: number }) => (
-                <tr key={d.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-mono text-gray-700 text-xs">{d.codigo}</td>
-                  <td className="px-4 py-3 font-medium text-gray-900">{d.nome}</td>
-                  <td className="px-4 py-3 text-gray-600">{d.cargaHoraria}h</td>
-                  <td className="px-4 py-3 text-gray-600">{d.semestreSugerido ? `${d.semestreSugerido}º` : '—'}</td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => { if (confirm('Remover disciplina?')) deletar.mutate(d.id) }} className="text-red-500 hover:text-red-700 p-1"><Trash2 size={16} /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="p-4 space-y-2">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={`skel-${i}`} className="h-10 w-full" />)}</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>{['Codigo', 'Nome', 'Carga horaria', 'Semestre sugerido', ''].map(h => <TableHead key={h}>{h}</TableHead>)}</TableRow>
+              </TableHeader>
+              <TableBody>
+                {disciplinas.map((d: { id: number; codigo: string; nome: string; cargaHoraria: number; semestreSugerido?: number }) => (
+                  <TableRow key={d.id}>
+                    <TableCell className="font-mono text-xs">{d.codigo}</TableCell>
+                    <TableCell className="font-medium">{d.nome}</TableCell>
+                    <TableCell className="text-muted-foreground">{d.cargaHoraria}h</TableCell>
+                    <TableCell className="text-muted-foreground hidden md:table-cell">{d.semestreSugerido ? d.semestreSugerido + 'o' : '-'}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"
+                        onClick={() => { if (confirm('Remover disciplina?')) deletar.mutate(d.id) }}>
+                        <Trash2 size={16} />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

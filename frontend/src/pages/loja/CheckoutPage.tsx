@@ -9,6 +9,10 @@ import { z } from 'zod'
 import { useState } from 'react'
 import { ShoppingBag } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
 
 const schema = z.object({
   enderecoEntrega: z.string().min(5, 'Informe o endereço completo'),
@@ -28,9 +32,9 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <ShoppingBag size={48} className="mx-auto text-gray-300 mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Carrinho vazio</h2>
-        <Link to="/loja" className="text-blue-700 hover:underline text-sm">Voltar à loja</Link>
+        <ShoppingBag size={48} className="mx-auto text-muted-foreground/30 mb-4" />
+        <h2 className="text-xl font-bold mb-2">Carrinho vazio</h2>
+        <Button variant="link" asChild><Link to="/loja">Voltar à loja</Link></Button>
       </div>
     )
   }
@@ -63,46 +67,40 @@ export default function CheckoutPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Finalizar pedido</h1>
+      <h1 className="text-2xl font-bold mb-8">Finalizar pedido</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <form onSubmit={handleSubmit(onSubmit)} className="lg:col-span-2 space-y-5">
           {usuario && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 text-sm text-primary">
               Pedido para: <strong>{usuario.email}</strong>
             </div>
           )}
-          <div>
-            <label htmlFor="enderecoEntrega" className="block text-sm font-medium text-gray-700 mb-1">Endereço de entrega</label>
-            <input
-              id="enderecoEntrega"
-              {...register('enderecoEntrega')}
-              placeholder="Rua, número, bairro, cidade, CEP"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.enderecoEntrega && <p className="text-red-500 text-xs mt-1">{errors.enderecoEntrega.message}</p>}
+          <div className="space-y-1">
+            <Label htmlFor="enderecoEntrega">Endereço de entrega</Label>
+            <Input id="enderecoEntrega" {...register('enderecoEntrega')} placeholder="Rua, número, bairro, cidade, CEP" />
+            {errors.enderecoEntrega && <p className="text-destructive text-xs">{errors.enderecoEntrega.message}</p>}
           </div>
-          <div>
-            <label htmlFor="observacoes" className="block text-sm font-medium text-gray-700 mb-1">Observações (opcional)</label>
+          <div className="space-y-1">
+            <Label htmlFor="observacoes">Observações (opcional)</Label>
             <textarea
               id="observacoes"
               {...register('observacoes')}
               rows={3}
               placeholder="Ex: não retirar da embalagem, deixar com porteiro..."
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-input rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
-          <button type="submit" disabled={submitting}
-            className="w-full bg-blue-700 text-white py-3 rounded-xl font-semibold hover:bg-blue-800 disabled:opacity-60 transition-colors">
+          <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? 'Processando...' : 'Confirmar pedido'}
-          </button>
-          <Link to="/carrinho" className="w-full flex justify-center text-sm text-gray-500 hover:text-blue-700 transition-colors">
-            Voltar ao carrinho
-          </Link>
+          </Button>
+          <Button variant="ghost" className="w-full text-muted-foreground" asChild>
+            <Link to="/carrinho">Voltar ao carrinho</Link>
+          </Button>
         </form>
 
-        <div className="bg-white border rounded-xl p-5 h-fit">
-          <h3 className="font-semibold text-gray-900 mb-4">Resumo</h3>
-          <div className="space-y-2 text-sm text-gray-600">
+        <Card className="h-fit"><CardContent className="p-5">
+          <h3 className="font-semibold mb-4">Resumo</h3>
+          <div className="space-y-2 text-sm text-muted-foreground">
             {items.map(item => (
               <div key={item.produtoId} className="flex justify-between">
                 <span className="truncate mr-2">{item.nome} × {item.quantidade}</span>
@@ -110,11 +108,11 @@ export default function CheckoutPage() {
               </div>
             ))}
           </div>
-          <div className="border-t mt-3 pt-3 flex justify-between font-bold text-gray-900">
+          <div className="border-t mt-3 pt-3 flex justify-between font-bold">
             <span>Total</span>
             <span>R$ {total().toFixed(2)}</span>
           </div>
-        </div>
+        </CardContent></Card>
       </div>
     </div>
   )
