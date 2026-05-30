@@ -13,7 +13,11 @@ public interface NotaRepository extends JpaRepository<Nota, Long> {
 
     @Query("""
         SELECT n FROM Nota n
-        JOIN n.matricula m
+        JOIN FETCH n.matricula m
+        JOIN FETCH m.turma t
+        JOIN FETCH t.disciplina
+        JOIN FETCH m.aluno a
+        JOIN FETCH a.usuario
         WHERE m.aluno.id = :alunoId
         ORDER BY n.dataAvaliacao DESC
     """)
@@ -21,9 +25,13 @@ public interface NotaRepository extends JpaRepository<Nota, Long> {
 
     @Query("""
         SELECT n FROM Nota n
-        JOIN n.matricula m
+        JOIN FETCH n.matricula m
+        JOIN FETCH m.turma t
+        JOIN FETCH t.disciplina
+        JOIN FETCH m.aluno a
+        JOIN FETCH a.usuario
         WHERE m.turma.id = :turmaId
-        ORDER BY m.aluno.ra, n.tipo
+        ORDER BY a.ra, n.tipo
     """)
     List<Nota> findByTurmaId(Long turmaId);
 }

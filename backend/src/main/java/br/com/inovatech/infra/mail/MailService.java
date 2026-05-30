@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import br.com.inovatech.modules.pedido.PedidoResumoDto;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
@@ -40,6 +42,15 @@ public class MailService {
         ctx.setVariable("ra", ra);
         String html = templateEngine.process("email/welcome", ctx);
         send(toEmail, "Bem-vindo à Inovatech!", html);
+    }
+
+    @Async
+    public void sendOrderConfirmation(String toEmail, String nome, PedidoResumoDto pedido) {
+        Context ctx = new Context();
+        ctx.setVariable("nome", nome);
+        ctx.setVariable("pedido", pedido);
+        String html = templateEngine.process("email/order-confirmation", ctx);
+        send(toEmail, "Pedido #" + pedido.id() + " confirmado — Inovatech", html);
     }
 
     @Async

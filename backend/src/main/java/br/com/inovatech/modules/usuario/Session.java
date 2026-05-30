@@ -2,6 +2,7 @@ package br.com.inovatech.modules.usuario;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -31,9 +32,11 @@ public class Session {
     @Column(name = "expira_em", nullable = false)
     private LocalDateTime expiraEm;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean revogado = false;
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 }

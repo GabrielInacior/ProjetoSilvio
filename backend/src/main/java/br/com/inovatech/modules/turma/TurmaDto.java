@@ -18,8 +18,9 @@ public record TurmaDto(
     StatusTurma status
 ) {
     public static TurmaDto from(Turma t) {
+        String profNome = t.getProfessor() != null ? t.getProfessor().getUsuario().getNome() : null;
         return new TurmaDto(t.getId(), t.getDisciplina().getNome(),
-                t.getProfessor().getUsuario().getNome(), t.getAno(), t.getSemestre(),
+                profNome, t.getAno(), t.getSemestre(),
                 t.getSala(), t.getVagas(), t.getDiaSemana(), t.getHoraInicio(), t.getHoraFim(),
                 t.getDataInicio(), t.getDataFim(), t.getStatus());
     }

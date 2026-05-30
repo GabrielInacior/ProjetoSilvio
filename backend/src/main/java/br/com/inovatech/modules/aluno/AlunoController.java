@@ -6,6 +6,7 @@ import br.com.inovatech.modules.frequencia.*;
 import br.com.inovatech.modules.matricula.*;
 import br.com.inovatech.modules.notificacao.*;
 import br.com.inovatech.modules.pedido.*;
+import br.com.inovatech.modules.turma.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
@@ -14,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -23,6 +25,7 @@ public class AlunoController {
 
     private final AlunoRepository alunoRepo;
     private final MatriculaRepository matriculaRepo;
+    private final TurmaRepository turmaRepo;
     private final NotaRepository notaRepo;
     private final PresencaRepository presencaRepo;
     private final NotificacaoRepository notificacaoRepo;
@@ -54,6 +57,20 @@ public class AlunoController {
         return ResponseEntity.ok(
             notaRepo.findByAlunoId(aluno.getId()).stream().map(NotaDto::from).toList()
         );
+    }
+
+    @GetMapping("/frequencia")
+    public ResponseEntity<List<PresencaDetalheDto>> frequenciaGeral(@AuthenticationPrincipal UserDetails principal) {
+        Aluno aluno = getAluno(principal);
+        List<Presenca> presencas = presencaRepo.findAllByAlunoId(aluno.getId());
+        List<PresencaDetalheDto> result = presencas.stream().map(p ->
+            new PresencaDetalheDto(
+                p.getAula().getTurma().getDisciplina().getNome(),
+                p.getAula().getData().toString(),
+                p.isPresente()
+            )
+        ).toList();
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/frequencia/{turmaId}")
@@ -93,8 +110,48 @@ public class AlunoController {
         );
     }
 
+    // ── Auto-matrícula ─────────────────────────────────────────────────────
+
+    @GetMapping("/turmas/disponiveis")
+    public ResponseEntity<List<TurmaDto>> turmasDisponiveis(@AuthenticationPrincipal UserDetails principal) {
+        Aluno aluno = getAluno(principal);
+        return ResponseEntity.ok(
+            turmaRepo.findDisponiveisParaAluno(aluno.getId()).stream().map(TurmaDto::from).toList()
+        );
+    }
+
+    @PostMapping("/turmas/{turmaId}/matricular")
+    public ResponseEntity<MatriculaDto> matricular(@PathVariable Long turmaId,
+                                                    @AuthenticationPrincipal UserDetails principal) {
+        Aluno aluno = getAluno(principal);
+        Turma turma = turmaRepo.findById(turmaId)
+                .orElseThrow(() -> new EntityNotFoundException("Turma " + turmaId));
+        if (matriculaRepo.existsByAlunoIdAndTurmaId(aluno.getId(), turmaId)) {
+            throw new IllegalStateException("Você já está matriculado nesta turma.");
+        }
+        Matricula m = Matricula.builder()
+                .aluno(aluno)
+                .turma(turma)
+                .status(StatusMatricula.ATIVA)
+                .build();
+        return ResponseEntity.ok(MatriculaDto.from(matriculaRepo.save(m)));
+    }
+
+    @DeleteMapping("/matriculas/{matriculaId}/cancelar")
+    public ResponseEntity<Void> cancelarMatricula(@PathVariable Long matriculaId,
+                                                   @AuthenticationPrincipal UserDetails principal) {
+        Aluno aluno = getAluno(principal);
+        Matricula m = matriculaRepo.findById(matriculaId)
+                .filter(mat -> mat.getAluno().getId().equals(aluno.getId()))
+                .orElseThrow(() -> new EntityNotFoundException("Matrícula não encontrada"));
+        m.setStatus(StatusMatricula.CANCELADA);
+        matriculaRepo.save(m);
+        return ResponseEntity.noContent().build();
+    }
+
     // DTOs
     record FrequenciaResumoDto(long totalAulas, long aulaPresente, double percentualPresenca) {}
+    record PresencaDetalheDto(String disciplina, String data, boolean presente) {}
 
     @GetMapping("/documentos/declaracao-matricula")
     public ResponseEntity<byte[]> declaracaoMatricula(@AuthenticationPrincipal UserDetails principal) {

@@ -1,6 +1,7 @@
 package br.com.inovatech.modules.pedido;
 
 import br.com.inovatech.infra.exception.BusinessException;
+import br.com.inovatech.infra.mail.MailService;
 import br.com.inovatech.modules.produto.Produto;
 import br.com.inovatech.modules.produto.ProdutoRepository;
 import br.com.inovatech.modules.usuario.Usuario;
@@ -26,6 +27,7 @@ public class PedidoController {
     private final PedidoRepository pedidoRepo;
     private final ProdutoRepository produtoRepo;
     private final UsuarioRepository usuarioRepo;
+    private final MailService mailService;
 
     @GetMapping
     public ResponseEntity<Page<PedidoResumoDto>> meusPedidos(
@@ -74,7 +76,9 @@ public class PedidoController {
                 .build();
         itens.forEach(i -> { i.setPedido(pedido); pedido.getItens().add(i); });
 
-        return ResponseEntity.ok(PedidoResumoDto.from(pedidoRepo.save(pedido)));
+        PedidoResumoDto resultado = PedidoResumoDto.from(pedidoRepo.save(pedido));
+        mailService.sendOrderConfirmation(usuario.getEmail(), usuario.getNome(), resultado);
+        return ResponseEntity.ok(resultado);
     }
 
     private Usuario getUsuario(UserDetails principal) {

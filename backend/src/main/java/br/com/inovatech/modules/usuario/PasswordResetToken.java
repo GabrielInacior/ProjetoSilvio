@@ -2,6 +2,7 @@ package br.com.inovatech.modules.usuario;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,8 +26,9 @@ public class PasswordResetToken {
     @Column(name = "usado_em")
     private LocalDateTime usadoEm;
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 
     public boolean isUsado() {
         return usadoEm != null;

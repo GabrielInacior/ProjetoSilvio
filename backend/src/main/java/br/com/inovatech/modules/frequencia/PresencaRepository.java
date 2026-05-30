@@ -30,4 +30,14 @@ public interface PresencaRepository extends JpaRepository<Presenca, Long> {
           AND p.presente = true
     """)
     Long countPresencasByAlunoIdAndTurmaId(Long alunoId, Long turmaId);
+
+    @Query("""
+        SELECT p FROM Presenca p
+        JOIN FETCH p.aula a
+        JOIN FETCH a.turma t
+        JOIN FETCH t.disciplina
+        WHERE p.aluno.id = :alunoId
+        ORDER BY a.data
+    """)
+    List<Presenca> findAllByAlunoId(Long alunoId);
 }

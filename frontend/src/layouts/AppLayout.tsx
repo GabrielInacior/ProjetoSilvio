@@ -1,12 +1,13 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { useEffect } from 'react'
 import { connectWS, disconnectWS } from '@/lib/websocket'
 import { toast } from 'sonner'
 import {
   LayoutDashboard, BookOpen, BarChart2, Calendar, FileText,
-  ShoppingBag, Bell, User, LogOut, ClipboardList
+  ShoppingBag, Bell, User, LogOut, ClipboardList, Package, ShoppingCart
 } from 'lucide-react'
+import { useCartStore } from '@/stores/cartStore'
 
 const nav = [
   { to: '/app/dashboard',  label: 'Dashboard',   Icon: LayoutDashboard },
@@ -15,12 +16,14 @@ const nav = [
   { to: '/app/frequencia', label: 'Frequência',  Icon: BookOpen },
   { to: '/app/calendario', label: 'Calendário',  Icon: Calendar },
   { to: '/app/documentos', label: 'Documentos',  Icon: FileText },
-  { to: '/app/pedidos',    label: 'Pedidos',     Icon: ShoppingBag },
+  { to: '/loja',           label: 'Loja',        Icon: ShoppingBag },
+  { to: '/app/pedidos',    label: 'Meus Pedidos', Icon: Package },
   { to: '/app/perfil',     label: 'Perfil',      Icon: User },
 ]
 
 export default function AppLayout() {
   const { usuario, accessToken, logout } = useAuthStore()
+  const { items } = useCartStore()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -70,6 +73,14 @@ export default function AppLayout() {
       {/* Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white border-b px-8 py-4 flex items-center justify-end gap-3">
+          <Link to="/carrinho" className="relative text-gray-500 hover:text-blue-700 transition-colors">
+            <ShoppingCart size={20} />
+            {items.length > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 bg-blue-700 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {items.length}
+              </span>
+            )}
+          </Link>
           <Bell size={20} className="text-gray-500 cursor-pointer" />
           <span className="text-sm text-gray-600">{usuario?.email}</span>
         </header>

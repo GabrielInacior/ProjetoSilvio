@@ -9,12 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
-    @Query("""
-        SELECT p FROM Pedido p
-        JOIN FETCH p.itens i
-        JOIN FETCH i.produto
-        WHERE p.usuario.id = :usuarioId
-        ORDER BY p.criadoEm DESC
-    """)
+    @Query(value = "SELECT p FROM Pedido p WHERE p.usuario.id = :usuarioId ORDER BY p.criadoEm DESC",
+           countQuery = "SELECT COUNT(p) FROM Pedido p WHERE p.usuario.id = :usuarioId")
     Page<Pedido> findByUsuarioId(Long usuarioId, Pageable pageable);
 }

@@ -1,0 +1,51 @@
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.5)
+
+2026-05-30T11:21:44.189-03:00  INFO 27044 --- [inovatech-backend] [           main] br.com.inovatech.InovatechApplication    : Starting InovatechApplication v1.0.0 using Java 24.0.1 with PID 27044 (C:\Project\ProjetoSilvio\backend\target\inovatech-backend-1.0.0.jar started by Inacio in C:\Project\ProjetoSilvio\backend)
+2026-05-30T11:21:44.193-03:00 DEBUG 27044 --- [inovatech-backend] [           main] br.com.inovatech.InovatechApplication    : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-05-30T11:21:44.194-03:00  INFO 27044 --- [inovatech-backend] [           main] br.com.inovatech.InovatechApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-05-30T11:21:46.349-03:00  INFO 27044 --- [inovatech-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-30T11:21:46.490-03:00  INFO 27044 --- [inovatech-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 121 ms. Found 17 JPA repository interfaces.
+2026-05-30T11:21:48.595-03:00  INFO 27044 --- [inovatech-backend] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-05-30T11:21:48.640-03:00  INFO 27044 --- [inovatech-backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-30T11:21:48.640-03:00  INFO 27044 --- [inovatech-backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-05-30T11:21:48.716-03:00  INFO 27044 --- [inovatech-backend] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-05-30T11:21:48.717-03:00  INFO 27044 --- [inovatech-backend] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 4443 ms
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+2026-05-30T11:21:50.030-03:00  INFO 27044 --- [inovatech-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-30T11:21:50.551-03:00  INFO 27044 --- [inovatech-backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4ca5cb99
+2026-05-30T11:21:51.004-03:00  INFO 27044 --- [inovatech-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-30T11:21:51.145-03:00  INFO 27044 --- [inovatech-backend] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/inovatech (PostgreSQL 16.6)
+2026-05-30T11:21:51.300-03:00  INFO 27044 --- [inovatech-backend] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 6 migrations (execution time 00:00.065s)
+2026-05-30T11:21:51.477-03:00  INFO 27044 --- [inovatech-backend] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 6
+2026-05-30T11:21:51.483-03:00  INFO 27044 --- [inovatech-backend] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-05-30T11:21:51.669-03:00  INFO 27044 --- [inovatech-backend] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-30T11:21:51.749-03:00  INFO 27044 --- [inovatech-backend] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-05-30T11:21:51.797-03:00  INFO 27044 --- [inovatech-backend] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-30T11:21:52.177-03:00  INFO 27044 --- [inovatech-backend] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-30T11:21:52.247-03:00  WARN 27044 --- [inovatech-backend] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-05-30T11:21:54.838-03:00  INFO 27044 --- [inovatech-backend] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-30T11:21:54.936-03:00  INFO 27044 --- [inovatech-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-30T11:21:55.717-03:00 DEBUG 27044 --- [inovatech-backend] [           main] b.c.i.i.s.JwtAuthenticationFilter        : Filter 'jwtAuthenticationFilter' configured for use
+2026-05-30T11:21:56.078-03:00  INFO 27044 --- [inovatech-backend] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-30T11:21:58.546-03:00  WARN 27044 --- [inovatech-backend] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used for username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider.
+2026-05-30T11:21:59.292-03:00  WARN 27044 --- [inovatech-backend] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-30T11:21:59.943-03:00  INFO 27044 --- [inovatech-backend] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-05-30T11:22:01.025-03:00  INFO 27044 --- [inovatech-backend] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-05-30T11:22:01.029-03:00  INFO 27044 --- [inovatech-backend] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2026-05-30T11:22:01.030-03:00  INFO 27044 --- [inovatech-backend] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@41d6e344]]
+2026-05-30T11:22:01.031-03:00  INFO 27044 --- [inovatech-backend] [           main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2026-05-30T11:22:01.055-03:00  INFO 27044 --- [inovatech-backend] [           main] br.com.inovatech.InovatechApplication    : Started InovatechApplication in 17.456 seconds (process running for 18.339)
+2026-05-30T11:22:01.312-03:00  INFO 27044 --- [inovatech-backend] [           main] br.com.inovatech.infra.seed.DataSeeder   : [DataSeeder] Dados de seed já existem. Pulando.
+2026-05-30T11:22:32.535-03:00  INFO 27044 --- [inovatech-backend] [nio-8080-exec-3] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-30T11:22:32.535-03:00  INFO 27044 --- [inovatech-backend] [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-30T11:22:32.536-03:00  INFO 27044 --- [inovatech-backend] [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-05-30T11:23:00.917-03:00  INFO 27044 --- [inovatech-backend] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 3, active threads = 1, queued tasks = 2, completed tasks = 0]

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Pedido Confirmado — Inovatech</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background:#1a56db;padding:32px;text-align:center;">
+              <h1 style="color:#ffffff;margin:0;font-size:22px;">✅ Pedido Confirmado!</h1>
+              <p style="color:#bfdbfe;margin:8px 0 0;font-size:14px;">Inovatech — Loja Oficial</p>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding:40px 48px;">
+              <h2 style="color:#111827;margin:0 0 8px;font-size:18px;">
+                Olá, <span th:text="${nome}">Cliente</span>!
+              </h2>
+              <p style="color:#374151;line-height:1.6;margin:0 0 24px;">
+                Seu pedido foi recebido e está sendo processado. Confira os detalhes abaixo.
+              </p>
+
+              <!-- Order info -->
+              <table style="width:100%;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin:0 0 24px;">
+                <tr style="background:#f9fafb;">
+                  <td style="padding:10px 16px;color:#6b7280;font-size:13px;font-weight:bold;text-transform:uppercase;letter-spacing:.05em;">
+                    Pedido #<span th:text="${pedido.id}">0</span>
+                  </td>
+                  <td style="padding:10px 16px;text-align:right;">
+                    <span style="background:#d1fae5;color:#065f46;font-size:12px;font-weight:bold;padding:3px 10px;border-radius:999px;"
+                          th:text="${pedido.status}">CONFIRMADO</span>
+                  </td>
+                </tr>
+                <!-- Items -->
+                <tr th:each="item : ${pedido.itens}">
+                  <td style="padding:10px 16px;border-top:1px solid #f3f4f6;color:#374151;font-size:14px;">
+                    <span th:text="${item.nome}">Produto</span>
+                    <span style="color:#6b7280;" th:text="' × ' + ${item.quantidade}"> × 1</span>
+                  </td>
+                  <td style="padding:10px 16px;border-top:1px solid #f3f4f6;text-align:right;color:#111827;font-size:14px;font-weight:500;">
+                    R$ <span th:text="${#numbers.formatDecimal(item.subtotal, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+                  </td>
+                </tr>
+                <!-- Total -->
+                <tr style="background:#f9fafb;">
+                  <td style="padding:12px 16px;border-top:2px solid #e5e7eb;color:#111827;font-weight:bold;font-size:15px;">
+                    Total
+                  </td>
+                  <td style="padding:12px 16px;border-top:2px solid #e5e7eb;text-align:right;color:#1a56db;font-weight:bold;font-size:15px;">
+                    R$ <span th:text="${#numbers.formatDecimal(pedido.valorTotal, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Delivery address -->
+              <div th:if="${pedido.enderecoEntrega != null and !pedido.enderecoEntrega.isEmpty()}"
+                   style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:16px;margin:0 0 24px;">
+                <p style="margin:0 0 4px;color:#1e40af;font-size:13px;font-weight:bold;">📦 Endereço de entrega</p>
+                <p style="margin:0;color:#374151;font-size:14px;" th:text="${pedido.enderecoEntrega}">—</p>
+              </div>
+
+              <!-- Observations -->
+              <div th:if="${pedido.observacoes != null and !pedido.observacoes.isEmpty()}"
+                   style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:16px;margin:0 0 24px;">
+                <p style="margin:0 0 4px;color:#6b7280;font-size:13px;font-weight:bold;">📝 Observações</p>
+                <p style="margin:0;color:#374151;font-size:14px;" th:text="${pedido.observacoes}">—</p>
+              </div>
+
+              <p style="color:#374151;line-height:1.6;margin:0 0 24px;">
+                Acompanhe o status do seu pedido diretamente no portal da Inovatech.
+              </p>
+              <div style="text-align:center;">
+                <a href="#" style="background:#1a56db;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:6px;font-size:15px;font-weight:bold;display:inline-block;">
+                  Ver Meus Pedidos
+                </a>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background:#f9fafb;padding:24px 48px;border-top:1px solid #e5e7eb;text-align:center;">
+              <p style="color:#9ca3af;font-size:12px;margin:0;">
+                © 2026 Faculdade Inovatech. Todos os direitos reservados.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

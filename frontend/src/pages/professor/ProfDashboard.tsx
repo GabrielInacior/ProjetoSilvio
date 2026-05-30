@@ -49,7 +49,7 @@ export default function ProfDashboard() {
               className="flex items-center justify-between border rounded-lg px-4 py-3 hover:bg-gray-50 transition-colors">
               <div>
                 <p className="font-medium text-gray-900 text-sm">{t.disciplina}</p>
-                <p className="text-xs text-gray-500">{t.ano}/{t.semestre}º — {t.sala} — {t.diaSemana} {t.horaInicio}</p>
+                <p className="text-xs text-gray-500">{t.ano}/{t.semestre === 'PRIMEIRO' ? '1' : '2'}º — {t.sala} — {t.diaSemana} {t.horaInicio}</p>
               </div>
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                 t.status === 'ATIVA' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'

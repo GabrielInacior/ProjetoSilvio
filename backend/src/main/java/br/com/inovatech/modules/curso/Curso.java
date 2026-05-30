@@ -3,6 +3,7 @@ package br.com.inovatech.modules.curso;
 import br.com.inovatech.modules.professor.Professor;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -40,8 +41,9 @@ public class Curso {
     @JoinColumn(name = "coordenador_id")
     private Professor coordenador;
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 
     @UpdateTimestamp
     @Column(name = "atualizado_em", nullable = false)

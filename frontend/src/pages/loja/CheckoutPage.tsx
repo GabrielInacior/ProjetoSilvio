@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useState } from 'react'
 import { ShoppingBag } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 
 const schema = z.object({
   enderecoEntrega: z.string().min(5, 'Informe o endereço completo'),
@@ -19,6 +20,7 @@ export default function CheckoutPage() {
   const { items, total, clear } = useCartStore()
   const { usuario } = useAuthStore()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [submitting, setSubmitting] = useState(false)
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) })
@@ -36,14 +38,22 @@ export default function CheckoutPage() {
   const onSubmit = async (d: FormData) => {
     setSubmitting(true)
     try {
-      await api.post('/pedidos/checkout', {
+      const res = await api.post('/pedidos/checkout', {
         itens: items.map(i => ({ produtoId: i.produtoId, quantidade: i.quantidade })),
         enderecoEntrega: d.enderecoEntrega,
         observacoes: d.observacoes ?? '',
       })
       clear()
-      toast.success('Pedido realizado com sucesso!')
-      navigate('/app/pedidos')
+      // invalida cache para que a tela de pedidos recarregue imediatamente
+      await queryClient.invalidateQueries({ queryKey: ['aluno-pedidos'] })
+      await queryClient.invalidateQueries({ queryKey: ['prof-pedidos'] })
+      const pedidoId = (res.data as { id?: number })?.id
+      const label = pedidoId ? `Pedido #${pedidoId} realizado!` : 'Pedido realizado!'
+      toast.success(label, {
+        description: 'Um e-mail de confirmação foi enviado para você.',
+        duration: 6000,
+      })
+      navigate(usuario?.tipo === 'PROFESSOR' ? '/prof/pedidos' : '/app/pedidos')
     } catch {
       toast.error('Erro ao finalizar pedido. Tente novamente.')
     } finally {
@@ -62,8 +72,9 @@ export default function CheckoutPage() {
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Endereço de entrega</label>
+            <label htmlFor="enderecoEntrega" className="block text-sm font-medium text-gray-700 mb-1">Endereço de entrega</label>
             <input
+              id="enderecoEntrega"
               {...register('enderecoEntrega')}
               placeholder="Rua, número, bairro, cidade, CEP"
               className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -71,8 +82,9 @@ export default function CheckoutPage() {
             {errors.enderecoEntrega && <p className="text-red-500 text-xs mt-1">{errors.enderecoEntrega.message}</p>}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Observações (opcional)</label>
+            <label htmlFor="observacoes" className="block text-sm font-medium text-gray-700 mb-1">Observações (opcional)</label>
             <textarea
+              id="observacoes"
               {...register('observacoes')}
               rows={3}
               placeholder="Ex: não retirar da embalagem, deixar com porteiro..."

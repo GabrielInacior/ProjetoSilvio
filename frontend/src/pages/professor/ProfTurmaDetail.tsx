@@ -62,6 +62,12 @@ export default function ProfTurmaDetail() {
     onError: () => toast.error('Erro ao lançar nota.'),
   })
 
+  const matricularAluno = useMutation({
+    mutationFn: (alunoId: number) => api.post(`/professor/turmas/${id}/matricular`, { alunoId }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['turma-alunos', id] }); toast.success('Aluno adicionado!'); setShowAddAluno(false); setAddAlunoId('') },
+    onError: () => toast.error('Erro ao adicionar aluno.'),
+  })
+
   return (
     <div>
       <div className="flex items-center gap-2 mb-6">
@@ -82,24 +88,30 @@ export default function ProfTurmaDetail() {
 
       {/* Alunos */}
       {tab === 'Alunos' && (
-        <div className="bg-white border rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>{['RA', 'Nome', 'E-mail', 'Status'].map((h) => <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700">{h}</th>)}</tr>
-            </thead>
-            <tbody className="divide-y">
-              {(alunos as { id: number; ra: string; nome: string; email: string; status: string }[]).map((a) => (
-                <tr key={a.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-mono text-gray-700">{a.ra}</td>
-                  <td className="px-4 py-3 font-medium text-gray-900">{a.nome}</td>
-                  <td className="px-4 py-3 text-gray-600">{a.email}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${a.status === 'ATIVO' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{a.status}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-semibold text-gray-900">Alunos matriculados ({(alunos as any[]).length})</h2>
+          </div>
+
+          <div className="bg-white border rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b">
+                <tr>{['RA', 'Nome', 'E-mail', 'Status'].map((h) => <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700">{h}</th>)}</tr>
+              </thead>
+              <tbody className="divide-y">
+                {(alunos as { id: number; ra: string; nome: string; email: string; status: string }[]).map((a) => (
+                  <tr key={a.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-mono text-gray-700">{a.ra}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">{a.nome}</td>
+                    <td className="px-4 py-3 text-gray-600">{a.email}</td>
+                    <td className="px-4 py-3">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${a.status === 'ATIVA' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>{a.status}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
@@ -184,7 +196,7 @@ export default function ProfTurmaDetail() {
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Tipo</label>
                 <select {...notaForm.register('tipo')} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  {['PROVA', 'TRABALHO', 'SEMINARIO', 'ATIVIDADE', 'PROJETO'].map(t => <option key={t} value={t}>{t}</option>)}
+                  {['P1', 'P2', 'P3', 'TRABALHO', 'SEMINARIO', 'PROJETO', 'RECUPERACAO', 'FINAL'].map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
               {[['valor', 'Valor (0–10)', 'number'], ['peso', 'Peso', 'number'], ['dataAvaliacao', 'Data', 'date'], ['descricao', 'Descrição', 'text']].map(([field, label, type]) => (

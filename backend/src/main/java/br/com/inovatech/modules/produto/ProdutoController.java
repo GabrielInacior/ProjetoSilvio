@@ -18,13 +18,23 @@ public class ProdutoController {
     public ResponseEntity<Page<ProdutoDto>> listar(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
-            @RequestParam(required = false) String categoria) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("nome").ascending());
-        if (categoria != null) {
-            CategoriaProduto cat = CategoriaProduto.valueOf(categoria.toUpperCase());
-            return ResponseEntity.ok(produtoRepo.findByAtivoTrueAndCategoria(cat, pageable).map(ProdutoDto::from));
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) String busca,
+            @RequestParam(defaultValue = "nome") String sort,
+            @RequestParam(defaultValue = "asc") String dir) {
+        Sort.Direction direction = "desc".equalsIgnoreCase(dir) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        String sortField = switch (sort) {
+            case "preco" -> "preco";
+            case "estoque" -> "estoque";
+            default -> "nome";
+        };
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortField));
+        CategoriaProduto cat = null;
+        if (categoria != null && !categoria.isBlank()) {
+            try { cat = CategoriaProduto.valueOf(categoria.toUpperCase()); } catch (IllegalArgumentException ignored) {}
         }
-        return ResponseEntity.ok(produtoRepo.findByAtivoTrue(pageable).map(ProdutoDto::from));
+        String buscaTrim = (busca != null && !busca.isBlank()) ? busca.trim() : null;
+        return ResponseEntity.ok(produtoRepo.buscar(buscaTrim, cat, pageable).map(ProdutoDto::from));
     }
 
     @GetMapping("/{slug}")

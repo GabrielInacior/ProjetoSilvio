@@ -3,6 +3,8 @@ package br.com.inovatech.modules.pedido;
 import br.com.inovatech.modules.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
@@ -42,11 +44,13 @@ public class Pedido {
     private Long version;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 30)
     @Builder.Default
     private List<PedidoItem> itens = new ArrayList<>();
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 
     @UpdateTimestamp
     @Column(name = "atualizado_em", nullable = false)

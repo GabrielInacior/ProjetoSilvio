@@ -5,6 +5,7 @@
 backend/target/
 backend/uploads/
 backend/.mvn/wrapper/maven-wrapper.jar
+backend/src/main/resources/application-dev.yml
 *.class
 *.jar
 *.war

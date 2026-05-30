@@ -3,6 +3,7 @@ package br.com.inovatech.modules.notificacao;
 import br.com.inovatech.modules.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
@@ -36,8 +37,9 @@ public class Notificacao {
     @Column(name = "lida_em")
     private LocalDateTime lidaEm;
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 
     public void marcarLida() {
         this.lida = true;

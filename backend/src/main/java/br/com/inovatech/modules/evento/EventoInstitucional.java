@@ -3,6 +3,7 @@ package br.com.inovatech.modules.evento;
 import br.com.inovatech.modules.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -40,8 +41,9 @@ public class EventoInstitucional {
     @JoinColumn(name = "criado_por")
     private Usuario criadoPor;
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 
     @UpdateTimestamp
     @Column(name = "atualizado_em", nullable = false)

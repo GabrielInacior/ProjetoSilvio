@@ -4,6 +4,7 @@ import br.com.inovatech.modules.matricula.Matricula;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
@@ -40,8 +41,9 @@ public class Nota {
     @Column(name = "data_avaliacao")
     private LocalDate dataAvaliacao;
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 
     @UpdateTimestamp
     @Column(name = "atualizado_em", nullable = false)

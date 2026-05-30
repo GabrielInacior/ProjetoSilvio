@@ -7,6 +7,7 @@ public record NotaDto(
     Long id,
     Long matriculaId,
     String disciplina,
+    String aluno,
     TipoNota tipo,
     BigDecimal valor,
     BigDecimal peso,
@@ -14,8 +15,10 @@ public record NotaDto(
     LocalDate dataAvaliacao
 ) {
     public static NotaDto from(Nota n) {
-        String disc = n.getMatricula().getTurma().getDisciplina().getNome();
-        return new NotaDto(n.getId(), n.getMatricula().getId(), disc,
+        var m = n.getMatricula();
+        String disc = m.getTurma().getDisciplina().getNome();
+        String alunoNome = m.getAluno() != null ? m.getAluno().getUsuario().getNome() : null;
+        return new NotaDto(n.getId(), m.getId(), disc, alunoNome,
                 n.getTipo(), n.getValor(), n.getPeso(), n.getDescricao(), n.getDataAvaliacao());
     }
 }

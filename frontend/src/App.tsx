@@ -6,6 +6,7 @@ import { Toaster } from 'sonner'
 import PublicLayout from '@/layouts/PublicLayout'
 import AppLayout from '@/layouts/AppLayout'
 import ProfLayout from '@/layouts/ProfLayout'
+import LojaLayout from '@/layouts/LojaLayout'
 import AdminLayout from '@/layouts/AdminLayout'
 import AuthGuard from '@/components/AuthGuard'
 
@@ -39,6 +40,8 @@ import ProfDashboard from '@/pages/professor/ProfDashboard'
 import ProfTurmas from '@/pages/professor/ProfTurmas'
 import ProfTurmaDetail from '@/pages/professor/ProfTurmaDetail'
 import ProfChamada from '@/pages/professor/ProfChamada'
+import ProfPerfil from '@/pages/professor/ProfPerfil'
+import ProfPedidos from '@/pages/professor/ProfPedidos'
 
 // Admin
 import AdminDashboard from '@/pages/admin/AdminDashboard'
@@ -75,10 +78,6 @@ export default function App() {
             <Route path="/cursos/:slug" element={<CursoDetailPage />} />
             <Route path="/eventos" element={<EventosPage />} />
             <Route path="/sobre" element={<SobrePage />} />
-            <Route path="/loja" element={<LojaPage />} />
-            <Route path="/loja/:slug" element={<ProdutoDetailPage />} />
-            <Route path="/carrinho" element={<CarrinhoPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
           </Route>
 
           {/* Auth */}
@@ -102,6 +101,16 @@ export default function App() {
             </Route>
           </Route>
 
+          {/* Loja — acessível por alunos e professores autenticados */}
+          <Route element={<AuthGuard roles={['ALUNO', 'PROFESSOR']} />}>
+            <Route element={<LojaLayout />}>
+              <Route path="/loja" element={<LojaPage />} />
+              <Route path="/loja/:slug" element={<ProdutoDetailPage />} />
+              <Route path="/carrinho" element={<CarrinhoPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+            </Route>
+          </Route>
+
           {/* Professor area */}
           <Route element={<AuthGuard roles={['PROFESSOR']} />}>
             <Route path="/prof" element={<ProfLayout />}>
@@ -110,6 +119,8 @@ export default function App() {
               <Route path="turmas" element={<ProfTurmas />} />
               <Route path="turmas/:id" element={<ProfTurmaDetail />} />
               <Route path="turmas/:id/chamada/:aulaId" element={<ProfChamada />} />
+              <Route path="perfil" element={<ProfPerfil />} />
+              <Route path="pedidos" element={<ProfPedidos />} />
             </Route>
           </Route>
 

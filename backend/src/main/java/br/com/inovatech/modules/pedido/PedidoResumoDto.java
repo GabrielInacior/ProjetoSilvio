@@ -9,10 +9,29 @@ public record PedidoResumoDto(
     StatusPedido status,
     BigDecimal valorTotal,
     int quantidadeItens,
-    LocalDateTime criadoEm
+    String enderecoEntrega,
+    String observacoes,
+    LocalDateTime criadoEm,
+    List<ItemResumoDto> itens
 ) {
+    public record ItemResumoDto(
+        String nome,
+        Integer quantidade,
+        BigDecimal precoUnitario,
+        BigDecimal subtotal
+    ) {}
+
     public static PedidoResumoDto from(Pedido p) {
-        return new PedidoResumoDto(p.getId(), p.getStatus(), p.getValorTotal(),
-                p.getItens().size(), p.getCriadoEm());
+        List<ItemResumoDto> itensDto = p.getItens().stream()
+                .map(i -> new ItemResumoDto(
+                        i.getProduto().getNome(),
+                        i.getQuantidade(),
+                        i.getPrecoUnitario(),
+                        i.getSubtotal()))
+                .toList();
+        return new PedidoResumoDto(
+                p.getId(), p.getStatus(), p.getValorTotal(),
+                p.getItens().size(), p.getEnderecoEntrega(), p.getObservacoes(),
+                p.getCriadoEm(), itensDto);
     }
 }

@@ -4,6 +4,7 @@ import br.com.inovatech.modules.aluno.Aluno;
 import br.com.inovatech.modules.aula.Aula;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,6 +27,7 @@ public class Presenca {
     @Column(nullable = false)
     private boolean presente = false;
 
+    @CreationTimestamp
     @Column(name = "registrado_em", nullable = false, updatable = false)
-    private LocalDateTime registradoEm = LocalDateTime.now();
+    private LocalDateTime registradoEm;
 }

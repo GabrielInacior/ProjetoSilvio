@@ -5,6 +5,8 @@ import br.com.inovatech.modules.avaliacao.*;
 import br.com.inovatech.modules.frequencia.*;
 import br.com.inovatech.modules.matricula.*;
 import br.com.inovatech.modules.turma.*;
+import br.com.inovatech.modules.aluno.Aluno;
+import br.com.inovatech.modules.aluno.AlunoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class ProfessorController {
     private final MatriculaRepository matriculaRepo;
     private final NotaRepository notaRepo;
     private final PresencaRepository presencaRepo;
+    private final AlunoRepository alunoRepo;
 
     private Professor getProfessor(UserDetails principal) {
         return professorRepo.findAll().stream()
@@ -49,11 +52,49 @@ public class ProfessorController {
         );
     }
 
-    @GetMapping("/turmas/{turmaId}/alunos")
-    public ResponseEntity<List<MatriculaDto>> alunosDaTurma(@PathVariable Long turmaId) {
+    @GetMapping("/turmas/disponiveis")
+    public ResponseEntity<List<TurmaDto>> turmasDisponiveis() {
         return ResponseEntity.ok(
-            matriculaRepo.findAtivasByTurmaId(turmaId).stream().map(MatriculaDto::from).toList()
+            turmaRepo.findAtivasComProfessorNulo().stream().map(TurmaDto::from).toList()
         );
+    }
+
+    @PostMapping("/turmas/{turmaId}/assumir")
+    public ResponseEntity<TurmaDto> assumirTurma(@PathVariable Long turmaId,
+                                                  @AuthenticationPrincipal UserDetails principal) {
+        Professor prof = getProfessor(principal);
+        Turma turma = turmaRepo.findById(turmaId)
+                .orElseThrow(() -> new EntityNotFoundException("Turma " + turmaId));
+        if (turma.getProfessor() != null) {
+            throw new IllegalStateException("Esta turma já possui professor atribuído");
+        }
+        turma.setProfessor(prof);
+        return ResponseEntity.ok(TurmaDto.from(turmaRepo.save(turma)));
+    }
+
+    @GetMapping("/turmas/{turmaId}/alunos")
+    public ResponseEntity<List<AlunoNaTurmaDto>> alunosDaTurma(@PathVariable Long turmaId) {
+        return ResponseEntity.ok(
+            matriculaRepo.findAtivasByTurmaId(turmaId).stream().map(AlunoNaTurmaDto::from).toList()
+        );
+    }
+
+    @PostMapping("/turmas/{turmaId}/matricular")
+    public ResponseEntity<AlunoNaTurmaDto> matricularAluno(@PathVariable Long turmaId,
+                                                            @RequestBody MatricularRequest req) {
+        if (matriculaRepo.existsByAlunoIdAndTurmaId(req.alunoId(), turmaId)) {
+            throw new IllegalStateException("Aluno já matriculado nesta turma");
+        }
+        Turma turma = turmaRepo.findById(turmaId)
+                .orElseThrow(() -> new EntityNotFoundException("Turma " + turmaId));
+        Aluno aluno = alunoRepo.getReferenceById(req.alunoId());
+        Matricula m = Matricula.builder().aluno(aluno).turma(turma).status(StatusMatricula.ATIVA).build();
+        matriculaRepo.save(m);
+        // reload with fetch
+        Matricula saved = matriculaRepo.findAtivasByTurmaId(turmaId).stream()
+                .filter(x -> x.getAluno().getId().equals(req.alunoId())).findFirst()
+                .orElseThrow();
+        return ResponseEntity.ok(AlunoNaTurmaDto.from(saved));
     }
 
     @GetMapping("/turmas/{turmaId}/aulas")
@@ -87,8 +128,7 @@ public class ProfessorController {
         for (ChamadaItem item : chamada) {
             Presenca presenca = presencaRepo.findByAulaIdAndAlunoId(aulaId, item.alunoId())
                     .orElseGet(() -> {
-                        br.com.inovatech.modules.aluno.Aluno aluno = new br.com.inovatech.modules.aluno.Aluno();
-                        aluno.setId(item.alunoId());
+                        Aluno aluno = alunoRepo.getReferenceById(item.alunoId());
                         return Presenca.builder().aula(aula).aluno(aluno).build();
                     });
             presenca.setPresente(item.presente());
@@ -124,4 +164,5 @@ public class ProfessorController {
 
     // inner request/dto records
     record ChamadaItem(Long alunoId, boolean presente) {}
+    record MatricularRequest(Long alunoId) {}
 }

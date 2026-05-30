@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Package, MapPin, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 type ItemPedido = {
   nome: string
@@ -38,7 +39,7 @@ function PedidoCard({ p }: { readonly p: Pedido }) {
         className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors text-left"
       >
         <div className="flex items-center gap-4">
-          <Package size={20} className="text-blue-600 shrink-0" />
+          <Package size={20} className="text-emerald-600 shrink-0" />
           <div>
             <p className="font-semibold text-gray-900">Pedido #{p.id}</p>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -60,7 +61,6 @@ function PedidoCard({ p }: { readonly p: Pedido }) {
 
       {open && (
         <div className="border-t px-5 pb-5 pt-4 space-y-4">
-          {/* Itens */}
           <div>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Itens</p>
             <div className="space-y-2">
@@ -73,19 +73,15 @@ function PedidoCard({ p }: { readonly p: Pedido }) {
             </div>
             <div className="flex items-center justify-between text-sm font-bold border-t pt-2 mt-2 text-gray-900">
               <span>Total</span>
-              <span className="text-blue-700">R$ {p.valorTotal?.toFixed(2)}</span>
+              <span className="text-emerald-700">R$ {p.valorTotal?.toFixed(2)}</span>
             </div>
           </div>
-
-          {/* Endereço */}
           {p.enderecoEntrega && (
             <div className="flex gap-2 text-sm text-gray-600">
               <MapPin size={15} className="shrink-0 mt-0.5 text-gray-400" />
               <span>{p.enderecoEntrega}</span>
             </div>
           )}
-
-          {/* Observações */}
           {p.observacoes && (
             <div className="flex gap-2 text-sm text-gray-600">
               <MessageSquare size={15} className="shrink-0 mt-0.5 text-gray-400" />
@@ -98,9 +94,9 @@ function PedidoCard({ p }: { readonly p: Pedido }) {
   )
 }
 
-export default function AlunoPedidos() {
+export default function ProfPedidos() {
   const { data, isLoading } = useQuery({
-    queryKey: ['aluno-pedidos'],
+    queryKey: ['prof-pedidos'],
     queryFn: () => api.get('/pedidos?size=20').then((r) => r.data),
   })
 
@@ -119,7 +115,9 @@ export default function AlunoPedidos() {
         <div className="text-center py-20 text-gray-400">
           <Package size={40} className="mx-auto mb-3 opacity-50" />
           <p>Nenhum pedido encontrado.</p>
-          <p className="text-sm mt-1">Visite a loja e faça seu primeiro pedido!</p>
+          <Link to="/loja" className="text-sm text-emerald-700 hover:underline mt-2 inline-block">
+            Visitar a loja
+          </Link>
         </div>
       )
     }
@@ -132,7 +130,13 @@ export default function AlunoPedidos() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Meus Pedidos</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Meus Pedidos</h1>
+        <Link to="/loja"
+          className="text-sm bg-emerald-700 text-white px-4 py-2 rounded-lg hover:bg-emerald-800 transition-colors">
+          Ir à loja
+        </Link>
+      </div>
       {renderContent()}
     </div>
   )
