@@ -4,7 +4,10 @@ import br.com.inovatech.modules.curso.Curso;
 import br.com.inovatech.modules.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,7 +46,9 @@ public class Aluno {
     @Column(name = "semestre_ingresso", length = 10)
     private String semestreIngresso;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "status_aluno", nullable = false)
     private StatusAluno status = StatusAluno.ATIVO;
 
@@ -53,8 +58,9 @@ public class Aluno {
     @Version
     private Long version;
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 
     @UpdateTimestamp
     @Column(name = "atualizado_em", nullable = false)

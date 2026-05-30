@@ -4,7 +4,9 @@ import br.com.inovatech.modules.aluno.Aluno;
 import br.com.inovatech.modules.turma.Turma;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +28,7 @@ public class Matricula {
     private Turma turma;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "status_matricula", nullable = false)
     private StatusMatricula status = StatusMatricula.ATIVA;
 

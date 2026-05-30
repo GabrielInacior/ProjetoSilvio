@@ -3,7 +3,9 @@ package br.com.inovatech.modules.aula;
 import br.com.inovatech.modules.turma.Turma;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +38,7 @@ public class Aula {
     private String conteudo;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "status_aula", nullable = false)
     private StatusAula status = StatusAula.AGENDADA;
 

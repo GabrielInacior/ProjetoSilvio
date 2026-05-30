@@ -3,6 +3,8 @@ package br.com.inovatech.modules.notificacao;
 import br.com.inovatech.modules.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,6 +26,7 @@ public class Notificacao {
     private String mensagem;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "tipo_notificacao", nullable = false)
     private TipoNotificacao tipo;
 

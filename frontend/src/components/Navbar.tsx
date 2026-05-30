@@ -67,10 +67,16 @@ export default function Navbar() {
               </button>
             </div>
           ) : (
-            <Link to="/login"
-              className="text-sm font-medium text-white bg-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-800 transition-colors">
-              Entrar
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link to="/cadastro"
+                className="text-sm font-medium text-blue-700 border border-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-50 transition-colors hidden sm:block">
+                Cadastre-se
+              </Link>
+              <Link to="/login"
+                className="text-sm font-medium text-white bg-blue-700 px-3 py-1.5 rounded-md hover:bg-blue-800 transition-colors">
+                Entrar
+              </Link>
+            </div>
           )}
           <button className="md:hidden p-2" onClick={() => setOpen(!open)}>
             {open ? <X size={20} /> : <Menu size={20} />}

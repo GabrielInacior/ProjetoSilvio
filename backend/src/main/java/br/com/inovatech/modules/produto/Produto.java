@@ -2,7 +2,9 @@ package br.com.inovatech.modules.produto;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -34,6 +36,7 @@ public class Produto {
     private String imagemUrl;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "categoria_produto", nullable = false)
     private CategoriaProduto categoria;
 

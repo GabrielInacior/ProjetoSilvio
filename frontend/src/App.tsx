@@ -20,6 +20,7 @@ import SobrePage from '@/pages/portal/SobrePage'
 
 // Auth
 import LoginPage from '@/pages/auth/LoginPage'
+import CadastroPage from '@/pages/auth/CadastroPage'
 import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage'
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage'
 
@@ -82,6 +83,7 @@ export default function App() {
 
           {/* Auth */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/cadastro" element={<CadastroPage />} />
           <Route path="/esqueci-senha" element={<ForgotPasswordPage />} />
           <Route path="/redefinir-senha" element={<ResetPasswordPage />} />
 

@@ -3,7 +3,9 @@ package br.com.inovatech.modules.pedido;
 import br.com.inovatech.modules.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,6 +25,7 @@ public class Pedido {
     private Usuario usuario;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "status_pedido", nullable = false)
     private StatusPedido status = StatusPedido.PENDENTE;
 

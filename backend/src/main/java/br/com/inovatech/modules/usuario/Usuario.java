@@ -2,7 +2,10 @@ package br.com.inovatech.modules.usuario;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +28,7 @@ public class Usuario {
     private String senhaHash;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "tipo_usuario", nullable = false)
     private TipoUsuario tipo = TipoUsuario.ALUNO;
 
@@ -37,8 +41,9 @@ public class Usuario {
     @Column(name = "senha_provisoria", nullable = false)
     private boolean senhaProvisoria = false;
 
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    private LocalDateTime criadoEm;
 
     @UpdateTimestamp
     @Column(name = "atualizado_em", nullable = false)

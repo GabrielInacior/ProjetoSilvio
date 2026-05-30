@@ -21,6 +21,11 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(req, httpReq));
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest req, HttpServletRequest httpReq) {
+        return ResponseEntity.status(201).body(authService.register(req, httpReq));
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@RequestBody RefreshRequest req) {
         return ResponseEntity.ok(authService.refresh(req.refreshToken()));

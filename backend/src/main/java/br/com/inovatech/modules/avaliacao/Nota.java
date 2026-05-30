@@ -3,7 +3,9 @@ package br.com.inovatech.modules.avaliacao;
 import br.com.inovatech.modules.matricula.Matricula;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,6 +24,7 @@ public class Nota {
     private Matricula matricula;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "tipo_nota", nullable = false)
     private TipoNota tipo;
 

@@ -5,7 +5,9 @@ import br.com.inovatech.modules.matricula.Matricula;
 import br.com.inovatech.modules.professor.Professor;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,6 +34,7 @@ public class Turma {
     private Integer ano;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "semestre_enum", nullable = false)
     private SemestreEnum semestre;
 
@@ -41,6 +44,7 @@ public class Turma {
     private Integer vagas;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "dia_semana")
     private DiaSemana diaSemana;
 
@@ -57,6 +61,7 @@ public class Turma {
     private LocalDate dataFim;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(columnDefinition = "status_turma", nullable = false)
     private StatusTurma status = StatusTurma.ATIVA;
 
