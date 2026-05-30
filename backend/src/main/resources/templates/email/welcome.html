@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Bem-vindo à Inovatech!</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1);">
+          <tr>
+            <td style="background:#1a56db;padding:32px;text-align:center;">
+              <h1 style="color:#ffffff;margin:0;font-size:24px;">Bem-vindo à Inovatech!</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:40px 48px;">
+              <h2 style="color:#111827;margin:0 0 16px;">Olá, <span th:text="${nome}">Aluno</span>!</h2>
+              <p style="color:#374151;line-height:1.6;margin:0 0 16px;">
+                Sua matrícula foi confirmada com sucesso. Seguem seus dados de acesso:
+              </p>
+              <table style="background:#f3f4f6;border-radius:6px;padding:16px;width:100%;margin:0 0 24px;">
+                <tr>
+                  <td style="color:#6b7280;font-size:14px;padding:4px 0;">RA:</td>
+                  <td style="color:#111827;font-weight:bold;font-size:14px;" th:text="${ra}">2024001</td>
+                </tr>
+              </table>
+              <p style="color:#374151;line-height:1.6;margin:0 0 24px;">
+                Acesse o portal acadêmico com seu e-mail e a senha padrão <strong>Inovatech@2026</strong>.
+                Recomendamos alterar sua senha no primeiro acesso.
+              </p>
+              <div style="text-align:center;">
+                <a href="#" style="background:#1a56db;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:6px;font-size:16px;font-weight:bold;display:inline-block;">
+                  Acessar Portal
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f9fafb;padding:24px 48px;border-top:1px solid #e5e7eb;">
+              <p style="color:#9ca3af;font-size:12px;margin:0;text-align:center;">
+                © 2026 Faculdade Inovatech. Todos os direitos reservados.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

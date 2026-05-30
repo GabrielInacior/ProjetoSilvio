@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; font-size: 11px; color: #111; padding: 36px; }
+    .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #1a56db; padding-bottom: 12px; }
+    .header h1 { font-size: 18px; color: #1a56db; }
+    .title { text-align: center; font-size: 14px; font-weight: bold; margin: 16px 0; text-transform: uppercase; }
+    .info-grid { display: flex; gap: 24px; margin-bottom: 20px; }
+    .info-item { flex: 1; }
+    .info-item label { font-weight: bold; color: #555; font-size: 9px; text-transform: uppercase; display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th { background: #1a56db; color: #fff; padding: 6px 8px; text-align: left; font-size: 10px; }
+    td { padding: 5px 8px; border-bottom: 1px solid #e5e7eb; }
+    tr:nth-child(even) td { background: #f9fafb; }
+    .media { font-weight: bold; }
+    .aprovado { color: #16a34a; }
+    .reprovado { color: #dc2626; }
+    .footer { margin-top: 32px; text-align: center; font-size: 10px; color: #777; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Faculdade Inovatech</h1>
+    <p>CNPJ: 00.000.000/0001-00 — Jales, SP</p>
+  </div>
+  <div class="title">Histórico Escolar</div>
+
+  <div class="info-grid">
+    <div class="info-item"><label>Nome</label><span th:text="${aluno.nome}"></span></div>
+    <div class="info-item"><label>RA</label><span th:text="${aluno.ra}"></span></div>
+    <div class="info-item"><label>Curso</label><span th:text="${aluno.curso}"></span></div>
+    <div class="info-item"><label>Data de Emissão</label><span th:text="${dataEmissao}"></span></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Disciplina</th>
+        <th>Semestre</th>
+        <th>Carga Horária</th>
+        <th>Média Final</th>
+        <th>Situação</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="item : ${historico}">
+        <td th:text="${item.disciplina}"></td>
+        <td th:text="${item.semestre}"></td>
+        <td th:text="${item.cargaHoraria} + 'h'"></td>
+        <td class="media" th:text="${#numbers.formatDecimal(item.media, 1, 1)}"></td>
+        <td>
+          <span th:if="${item.media >= 6}" class="aprovado">Aprovado</span>
+          <span th:unless="${item.media >= 6}" class="reprovado">Reprovado</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">Documento gerado automaticamente pelo Sistema Acadêmico Inovatech.</div>
+</body>
+</html>
