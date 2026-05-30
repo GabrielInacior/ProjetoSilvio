@@ -15,7 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import br.com.inovatech.infra.exception.BusinessException;
 import java.util.*;
 
 @RestController
@@ -127,7 +127,22 @@ public class AlunoController {
         Turma turma = turmaRepo.findById(turmaId)
                 .orElseThrow(() -> new EntityNotFoundException("Turma " + turmaId));
         if (matriculaRepo.existsByAlunoIdAndTurmaId(aluno.getId(), turmaId)) {
-            throw new IllegalStateException("Você já está matriculado nesta turma.");
+            throw new BusinessException("Você já está matriculado neste horário.");
+        }
+        // Verificar conflito de horário
+        if (turma.getDiaSemana() != null && turma.getHoraInicio() != null && turma.getHoraFim() != null) {
+            for (Matricula existente : matriculaRepo.findAtivasByAlunoId(aluno.getId())) {
+                Turma t = existente.getTurma();
+                if (t.getDiaSemana() == turma.getDiaSemana()
+                        && t.getHoraInicio() != null && t.getHoraFim() != null
+                        && t.getHoraInicio().compareTo(turma.getHoraFim()) < 0
+                        && turma.getHoraInicio().compareTo(t.getHoraFim()) < 0) {
+                    throw new BusinessException(
+                        "Conflito de horário com \"" + t.getDisciplina().getNome() + "\""
+                        + " (" + t.getDiaSemana() + " " + t.getHoraInicio() + "–" + t.getHoraFim() + ")"
+                    );
+                }
+            }
         }
         Matricula m = Matricula.builder()
                 .aluno(aluno)

@@ -1,10 +1,10 @@
 package br.com.inovatech.modules.turma;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface TurmaRepository extends JpaRepository<Turma, Long> {
@@ -41,6 +41,14 @@ public interface TurmaRepository extends JpaRepository<Turma, Long> {
         AND t.id NOT IN (
             SELECT m.turma.id FROM Matricula m
             WHERE m.aluno.id = :alunoId AND m.status = 'ATIVA'
+        )
+        AND NOT EXISTS (
+            SELECT m2 FROM Matricula m2
+            WHERE m2.aluno.id = :alunoId
+            AND m2.status = 'ATIVA'
+            AND m2.turma.diaSemana = t.diaSemana
+            AND m2.turma.horaInicio < t.horaFim
+            AND t.horaInicio < m2.turma.horaFim
         )
     """)
     List<Turma> findDisponiveisParaAluno(Long alunoId);

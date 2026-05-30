@@ -139,6 +139,37 @@ public class ProfessorController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/aulas/{aulaId}/chamada")
+    public ResponseEntity<List<ChamadaItem>> buscarChamada(@PathVariable Long aulaId) {
+        return ResponseEntity.ok(
+            presencaRepo.findByAulaId(aulaId).stream()
+                .map(p -> new ChamadaItem(p.getAluno().getId(), p.isPresente()))
+                .toList()
+        );
+    }
+
+    @GetMapping("/aulas/{aulaId}")
+    public ResponseEntity<AulaDto> buscarAula(@PathVariable Long aulaId) {
+        Aula aula = aulaRepo.findById(aulaId).orElseThrow(() -> new EntityNotFoundException("Aula " + aulaId));
+        return ResponseEntity.ok(AulaDto.from(aula));
+    }
+
+    @GetMapping("/turmas/{turmaId}/frequencia")
+    public ResponseEntity<List<FrequenciaTurmaDto>> frequenciaDaTurma(@PathVariable Long turmaId) {
+        long totalAulas = aulaRepo.findByTurmaIdOrderByDataAsc(turmaId).stream()
+                .filter(a -> a.getStatus() == StatusAula.REALIZADA).count();
+        List<FrequenciaTurmaDto> result = matriculaRepo.findAtivasByTurmaId(turmaId).stream().map(m -> {
+            long presentes = presencaRepo.countPresencasByAlunoIdAndTurmaId(m.getAluno().getId(), turmaId);
+            double pct = totalAulas == 0 ? 0 : presentes * 100.0 / totalAulas;
+            return new FrequenciaTurmaDto(
+                m.getAluno().getId(),
+                m.getAluno().getUsuario().getNome(),
+                totalAulas, presentes, Math.round(pct * 10) / 10.0
+            );
+        }).toList();
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/turmas/{turmaId}/notas")
     public ResponseEntity<List<NotaDto>> notasDaTurma(@PathVariable Long turmaId) {
         return ResponseEntity.ok(
@@ -165,4 +196,5 @@ public class ProfessorController {
     // inner request/dto records
     record ChamadaItem(Long alunoId, boolean presente) {}
     record MatricularRequest(Long alunoId) {}
+    record FrequenciaTurmaDto(Long alunoId, String nome, long totalAulas, long presentes, double percentual) {}
 }

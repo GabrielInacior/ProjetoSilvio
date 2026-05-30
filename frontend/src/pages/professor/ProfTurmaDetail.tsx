@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { useState } from 'react'
@@ -36,6 +36,18 @@ const notaSchema: z.ZodType<NotaForm> = z.object({
 
 const TABS = ['Alunos', 'Aulas', 'Notas', 'Frequência'] as const
 
+function freqBarClass(pct: number) {
+  if (pct >= 75) return 'bg-green-500'
+  if (pct >= 50) return 'bg-yellow-400'
+  return 'bg-red-500'
+}
+
+function freqTextClass(pct: number) {
+  if (pct >= 75) return 'text-green-600'
+  if (pct >= 50) return 'text-yellow-600'
+  return 'text-red-500'
+}
+
 export default function ProfTurmaDetail() {
   const { id } = useParams<{ id: string }>()
   const qc = useQueryClient()
@@ -46,6 +58,7 @@ export default function ProfTurmaDetail() {
   const { data: alunos = [] } = useQuery({ queryKey: ['turma-alunos', id], queryFn: () => api.get(`/professor/turmas/${id}/alunos`).then(r => r.data) })
   const { data: aulas = [] } = useQuery({ queryKey: ['turma-aulas', id], queryFn: () => api.get(`/professor/turmas/${id}/aulas`).then(r => r.data) })
   const { data: notas = [] } = useQuery({ queryKey: ['turma-notas', id], queryFn: () => api.get(`/professor/turmas/${id}/notas`).then(r => r.data) })
+  const { data: frequencia = [] } = useQuery({ queryKey: ['turma-frequencia', id], queryFn: () => api.get(`/professor/turmas/${id}/frequencia`).then(r => r.data), enabled: tab === 'Frequência' })
 
   const aulaForm = useForm<AulaForm>({ resolver: zodResolver(aulaSchema) })
   const notaForm = useForm<NotaForm>({ resolver: zodResolver(notaSchema as any) as Resolver<NotaForm> })
@@ -160,12 +173,14 @@ export default function ProfTurmaDetail() {
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${a.status === 'REALIZADA' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                     {a.status}
                   </span>
-                  {a.status !== 'REALIZADA' && (
-                    <Link to={`/prof/turmas/${id}/chamada/${a.id}`}
-                      className="text-xs bg-blue-700 text-white px-3 py-1 rounded-lg hover:bg-blue-800 transition-colors">
-                      Fazer chamada
-                    </Link>
-                  )}
+                  <Link to={`/prof/turmas/${id}/chamada/${a.id}`}
+                    className={`text-xs px-3 py-1 rounded-lg transition-colors ${
+                      a.status === 'REALIZADA'
+                        ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        : 'bg-blue-700 text-white hover:bg-blue-800'
+                    }`}>
+                    {a.status === 'REALIZADA' ? 'Editar chamada' : 'Fazer chamada'}
+                  </Link>
                 </div>
               </div>
             ))}
@@ -236,17 +251,39 @@ export default function ProfTurmaDetail() {
         </div>
       )}
 
-      {/* Frequência overview */}
+      {/* Frequência */}
       {tab === 'Frequência' && (
-        <div className="bg-white border rounded-xl p-5">
-          <p className="text-gray-500 text-sm">Para registrar presenças, acesse cada aula na aba <strong>Aulas</strong> e clique em "Fazer chamada".</p>
-          <div className="mt-4 space-y-2">
-            {(alunos as { id: number; nome: string }[]).map((a) => (
-              <div key={a.id} className="flex items-center justify-between border rounded-lg px-4 py-2.5">
-                <span className="text-sm font-medium text-gray-900">{a.nome}</span>
-                <span className="text-xs text-gray-400">Ver frequência na aba do aluno</span>
-              </div>
-            ))}
+        <div>
+          <h2 className="font-semibold text-gray-900 mb-4">Frequência por aluno</h2>
+          <div className="bg-white border rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b">
+                <tr>{['Aluno', 'Aulas realizadas', 'Presenças', 'Frequência'].map(h => (
+                  <th key={h} className="px-4 py-3 text-left font-semibold text-gray-700">{h}</th>
+                ))}</tr>
+              </thead>
+              <tbody className="divide-y">
+                {(frequencia as { alunoId: number; nome: string; totalAulas: number; presentes: number; percentual: number }[]).map(f => (
+                  <tr key={f.alunoId} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-900">{f.nome}</td>
+                    <td className="px-4 py-3 text-gray-600">{f.totalAulas}</td>
+                    <td className="px-4 py-3 text-gray-600">{f.presentes}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full transition-all ${freqBarClass(f.percentual)}`}
+                            style={{ width: `${f.percentual}%` }} />
+                        </div>
+                        <span className={`text-xs font-bold ${freqTextClass(f.percentual)}`}>{f.percentual.toFixed(1)}%</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {(frequencia as unknown[]).length === 0 && (
+                  <tr><td colSpan={4} className="px-4 py-8 text-center text-gray-400 text-sm">Nenhuma chamada registrada ainda.</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
